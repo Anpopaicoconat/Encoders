@@ -53,7 +53,7 @@ class SelectionDataset(Dataset):
             transformed_context = self.context_transform(context)  # [token_ids],[seg_ids],[masks]
             transformed_responses = self.response_transform(responses)  # [token_ids],[seg_ids],[masks]
             ret = transformed_context, transformed_responses, labels
-
+            print('datase', transformed_context.shape, transformed_responses.shape, labels.shape)
         return ret
 
     def batchify_join_str(self, batch):
