@@ -21,7 +21,7 @@ class BiEncoder(BertPreTrainedModel):
         print(context_input_ids.shape)
         batch_size, res_cnt, seq_length = responses_input_ids.shape
         
-        context_vec = torch.unsqueeze(xcontext_vec, 1).expand(-1, res_cnt, -1)
+        context_vec = torch.unsqueeze(context_vec, 1).expand(-1, res_cnt, -1)
         print(context_vec.shape)
         
         responses_input_ids = responses_input_ids.view(-1, seq_length)
