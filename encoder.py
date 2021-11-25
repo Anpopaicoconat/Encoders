@@ -87,11 +87,11 @@ class PolyEncoder(BertPreTrainedModel):
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
         batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
         
-        print_context = self.tokenizer.convert_ids_to_tokens(context_input_ids)
-        print_responses = self.tokenizer.convert_ids_to_tokens(responses_input_ids)
-        print('context:', print_context)
+        #print_context = self.tokenizer.convert_ids_to_tokens(context_input_ids)
+        #print_responses = self.tokenizer.convert_ids_to_tokens(responses_input_ids)
+        print('context:', context_input_ids.shape)
         print(context_input_masks)
-        print('responses:', print_responses)
+        print('responses:', responses_input_ids.shape)
         print(responses_input_masks)
         print('labels:', labels)
         
