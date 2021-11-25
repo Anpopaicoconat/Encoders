@@ -53,7 +53,6 @@ class SelectionDataset(Dataset):
             transformed_context = self.context_transform(context)  # [token_ids],[seg_ids],[masks]
             transformed_responses = self.response_transform(responses)  # [token_ids],[seg_ids],[masks]
             ret = transformed_context, transformed_responses, labels
-            print('datase', np.array(transformed_context[0]).shape, np.array(transformed_responses[0]).shape, np.array(labels).shape)
         return ret
 
     def batchify_join_str(self, batch):
@@ -100,7 +99,5 @@ class SelectionDataset(Dataset):
                 torch.tensor(t, dtype=torch.long) for t in long_tensors)
 
             labels_batch = torch.tensor(labels_batch, dtype=torch.long)
-            print('butchify', contexts_token_ids_list_batch.shape, contexts_input_masks_list_batch.shape, \
-                          responses_token_ids_list_batch.shape, responses_input_masks_list_batch.shape, labels_batch.shape)
             return contexts_token_ids_list_batch, contexts_input_masks_list_batch, \
                           responses_token_ids_list_batch, responses_input_masks_list_batch, labels_batch
