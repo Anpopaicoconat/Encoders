@@ -100,8 +100,8 @@ class PolyEncoder(BertPreTrainedModel):
         # response encoder
         print(responses_input_ids.shape, responses_input_masks.shape)
         print(seq_length)
-        responses_input_ids = responses_input_ids.view((-1, 32))
-        responses_input_masks = responses_input_masks.view((-1, 32))
+        responses_input_ids = torch.reshape(responses_input_ids.view, (-1, 32))
+        responses_input_masks = torch.reshape(responses_input_masks, (-1, 32))
         print(responses_input_ids.shape, responses_input_masks.shape)
         cand_emb = self.bert(responses_input_ids, responses_input_masks)[0]#[:,0,:] # [bs, dim]
         cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
