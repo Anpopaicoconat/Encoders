@@ -18,13 +18,16 @@ class BiEncoder(BertPreTrainedModel):
             responses_input_masks = responses_input_masks[:, :2, :]#.unsqueeze(1)
         print(context_input_ids.shape)
         context_vec = self.bert(context_input_ids, context_input_masks)[0]#[:,0,:]  # [bs,dim]
-        context_vec = context_vec.expand(3, 4)
         
         batch_size, res_cnt, seq_length = responses_input_ids.shape
+        
+        context_vec = context_vec.expand(batch_size, res_cnt,-1)
+        print(context_vec.shape)
+        
         responses_input_ids = responses_input_ids.view(-1, seq_length)
         responses_input_masks = responses_input_masks.view(-1, seq_length)
 
-        responses_vec = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:]  # [bs,dim]
+        responses_vec = self.bert(responses_input_ids, responses_input_masks)[0]#[:,0,:]  # [bs,dim]
         responses_vec = responses_vec.view(batch_size, res_cnt, -1)
 
         if labels is not None:
