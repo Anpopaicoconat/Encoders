@@ -202,7 +202,7 @@ if __name__ == '__main__':
         bert = BertModelClass(bert_config)
 
     if args.architecture == 'poly':
-        model = PolyEncoder(bert_config, bert=bert, poly_m=args.poly_m)
+        model = PolyEncoder(bert_config, bert=bert, poly_m=args.poly_m, tokenizer=tokenizer)
     elif args.architecture == 'bi':
         model = BiEncoder(bert_config, bert=bert)
     elif args.architecture == 'cross':
