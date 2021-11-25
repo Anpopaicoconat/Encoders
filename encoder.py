@@ -19,7 +19,7 @@ class BiEncoder(BertPreTrainedModel):
         print(context_input_ids.shape)
         context_vec = self.bert(context_input_ids, context_input_masks)[0]#[:,0,:]  # [bs,dim]
         context_vec = torch.unsqueeze(context_vec, 1)
-        print(context_input_ids.shape)
+        print(context_vec.shape)
         batch_size, res_cnt, seq_length = responses_input_ids.shape
         
         context_vec = context_vec.expand(-1, res_cnt, -1)
