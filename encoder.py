@@ -82,9 +82,9 @@ class PolyEncoder(BertPreTrainedModel):
                             responses_input_ids, responses_input_masks, labels=None):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
-        #if labels is not None:
-            #responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
-            #responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
+        if labels is not None:
+            responses_input_ids = responses_input_ids[:, :3, :]#.unsqueeze(1)
+            responses_input_masks = responses_input_masks[:, :3, :]#.unsqueeze(1)
         batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
         
         print('responses:', responses_input_ids.shape)
