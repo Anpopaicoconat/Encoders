@@ -4,7 +4,7 @@ from tqdm import tqdm
 import os
 import random
 import pickle
-
+import numpy as np
 
 class SelectionDataset(Dataset):
     def __init__(self, file_path, context_transform, response_transform, concat_transform, sample_cnt=None, mode='poly'):
@@ -53,7 +53,7 @@ class SelectionDataset(Dataset):
             transformed_context = self.context_transform(context)  # [token_ids],[seg_ids],[masks]
             transformed_responses = self.response_transform(responses)  # [token_ids],[seg_ids],[masks]
             ret = transformed_context, transformed_responses, labels
-            print('datase', transformed_context[0].shape, transformed_responses[0].shape, labels)
+            print('datase', np.array(transformed_context[0]).shape, np.array(transformed_responses[0]).shape, np.array(labels).shape)
         return ret
 
     def batchify_join_str(self, batch):
