@@ -83,10 +83,10 @@ class PolyEncoder(BertPreTrainedModel):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
         if labels is not None:
-            responses_input_ids = responses_input_ids[:, :3, :]#.unsqueeze(1)
-            responses_input_masks = responses_input_masks[:, :3, :]#.unsqueeze(1)
+            responses_input_ids = responses_input_ids[:, :2, :]#.unsqueeze(1)
+            responses_input_masks = responses_input_masks[:, :2, :]#.unsqueeze(1)
         batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
-        
+        res_cnt = 2 #attention!!!!!!!!!!
         print('responses:', responses_input_ids.shape)
 
         
@@ -98,10 +98,10 @@ class PolyEncoder(BertPreTrainedModel):
         embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
 
         # response encoder
-        #responses_input_ids = responses_input_ids.view(-1, seq_length)
-        #responses_input_masks = responses_input_masks.view(-1, seq_length)
+        responses_input_ids = responses_input_ids.view(-1, seq_length)
+        responses_input_masks = responses_input_masks.view(-1, seq_length)
         cand_emb = self.bert(responses_input_ids, responses_input_masks)[0]#[:,0,:] # [bs, dim]
-        cand_emb = cand_emb#.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
+        cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
 
         # merge
         if labels is not None:
