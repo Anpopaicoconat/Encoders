@@ -100,5 +100,7 @@ class SelectionDataset(Dataset):
                 torch.tensor(t, dtype=torch.long) for t in long_tensors)
 
             labels_batch = torch.tensor(labels_batch, dtype=torch.long)
+            print('butchify', contexts_token_ids_list_batch.shape, contexts_input_masks_list_batch.shape, \
+                          responses_token_ids_list_batch.shape, responses_input_masks_list_batch.shape, labels_batch.shape)
             return contexts_token_ids_list_batch, contexts_input_masks_list_batch, \
                           responses_token_ids_list_batch, responses_input_masks_list_batch, labels_batch
