@@ -25,14 +25,14 @@ class BiEncoder(BertPreTrainedModel):
         context_vec = context_vec.expand(-1, res_cnt, -1)
         print(context_vec.shape)
         
-        responses_input_ids = responses_input_ids.view(-1, seq_length)
-        responses_input_masks = responses_input_masks.view(-1, seq_length)
+        responses_input_ids = torch.reshape(responses_input_ids, (-1, seq_length)) #responses_input_ids.view(-1, seq_length)
+        responses_input_masks = torch.reshape(responses_input_masks, (-1, seq_length)) #responses_input_masks.view(-1, seq_length)
 
-        responses_vec = self.bert(responses_input_ids, responses_input_masks)[0]#[:,0,:]  # [bs,dim]
+        responses_vec = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:]  # [bs,dim]
         responses_vec = responses_vec.view(batch_size, res_cnt, -1)
 
         if labels is not None:
-            responses_vec = responses_vec.squeeze(1)
+            responses_vec = responses_vec#.squeeze(1)
             dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
             mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
             loss = F.log_softmax(dot_product, dim=-1) * mask
