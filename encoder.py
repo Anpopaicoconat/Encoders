@@ -65,6 +65,7 @@ class PolyEncoder(BertPreTrainedModel):
         super().__init__(config, *inputs, **kwargs)
         self.bert = kwargs['bert']
         self.poly_m = kwargs['poly_m']
+        self.tokenizer = kwargs['tokenizer']
         self.poly_code_embeddings = nn.Embedding(self.poly_m, config.hidden_size)
         # https://github.com/facebookresearch/ParlAI/blob/master/parlai/agents/transformer/polyencoder.py#L355
         torch.nn.init.normal_(self.poly_code_embeddings.weight, config.hidden_size ** -0.5)
@@ -85,7 +86,15 @@ class PolyEncoder(BertPreTrainedModel):
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
         batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
-
+        
+        print_context = self.tokenizer.convert_tokens_to_string(self.tokenizer.convert_ids_to_tokens(context_input_ids))
+        print_responses = self.tokenizer.convert_tokens_to_string(self.tokenizer.convert_ids_to_tokens(responses_input_ids))
+        print('context:', print_context)
+        print(context_input_masks)
+        print('responses:', print_responses)
+        print(responses_input_masks)
+        print('labels:', labels)
+        
         # context encoder
         ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
         poly_code_ids = torch.arange(self.poly_m, dtype=torch.long).to(context_input_ids.device)
