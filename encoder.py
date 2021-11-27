@@ -27,11 +27,16 @@ class BiEncoder(BertPreTrainedModel):
         responses_vec = responses_vec.view(batch_size, res_cnt, -1)
 
         if labels is not None:
-            responses_vec = responses_vec.squeeze(1)
-            dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
-            mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
-            loss = F.log_softmax(dot_product, dim=-1)
-            loss = (-loss.sum(dim=1)).mean()
+            pt_candidates = responses_vec.squeeze(1)
+            logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
+            labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
+            loss = self.cross_entropy(logits, labels)
+            
+            #responses_vec = responses_vec.squeeze(1)
+            #dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
+            #mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
+            #loss = F.log_softmax(dot_product, dim=-1)
+            #loss = (-loss.sum(dim=1)).mean()
             return loss
         else:
             context_vec = context_vec.unsqueeze(1)
@@ -104,13 +109,19 @@ class PolyEncoder(BertPreTrainedModel):
             # we are recycling responses for faster training
             # we repeat responses for batch_size times to simulate test phase
             # so that every context is paired with batch_size responses
-            cand_emb = cand_emb.permute(1, 0, 2) # [1, bs, dim]
-            cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
-            ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
-            dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
-            mask = torch.eye(batch_size).to(context_input_ids.device) # [bs, bs]
-            loss = F.log_softmax(dot_product, dim=-1)
-            loss = (-loss.sum(dim=1)).mean()
+            #cand_emb = cand_emb.permute(1, 0, 2) # [1, bs, dim]
+            #cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
+            #ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
+            #dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
+            #mask = torch.eye(batch_size).to(context_input_ids.device) # [bs, bs]
+            #loss = F.log_softmax(dot_product, dim=-1)
+            #loss = (-loss.sum(dim=1)).mean()
+            
+            pt_candidates = cand_emb.squeeze(1)
+            logits = (ctx_emb * pt_candidates).sum(-1)  # [bs, bs]
+            labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
+            loss = self.cross_entropy(logits, labels)
+            
             return loss
         else:
             ctx_emb = self.dot_attention(cand_emb, embs, embs) # [bs, res_cnt, dim]
