@@ -116,8 +116,8 @@ class PolyEncoder(BertPreTrainedModel):
             C_negs = 0.2
             mask = (torch.eye(batch_size) + C_negs) - torch.eye(batch_size)*C_negs # [bs, bs]
             mask = mask.to(context_input_ids.device)
-            loss = F.log_softmax(dot_product, dim=-1)
-            loss = (-loss.sum(dim=1)).mean() * mask
+            loss = F.log_softmax(dot_product, dim=-1) * mask
+            loss = (-loss.sum(dim=1)).mean() 
             
             #pt_candidates = cand_emb.squeeze(1)
             
