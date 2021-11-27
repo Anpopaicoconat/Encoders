@@ -14,28 +14,23 @@ class BiEncoder(BertPreTrainedModel):
                             responses_input_ids, responses_input_masks, labels=None):
         ## only select the first response (whose lbl==1)
         if labels is not None:
-            responses_input_ids = responses_input_ids[:, :2, :]#.unsqueeze(1)
-            responses_input_masks = responses_input_masks[:, :2, :]#.unsqueeze(1)
-        print(context_input_ids.shape)
+            responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
+            responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
+
         context_vec = self.bert(context_input_ids, context_input_masks)[0][:,0,:]  # [bs,dim]
-        context_vec = torch.unsqueeze(context_vec, 1)
-        print(context_vec.shape)
+
         batch_size, res_cnt, seq_length = responses_input_ids.shape
-        
-        context_vec = context_vec.expand(-1, res_cnt, -1)
-        print(context_vec.shape)
-        
-        responses_input_ids = torch.reshape(responses_input_ids, (-1, seq_length)) #responses_input_ids.view(-1, seq_length)
-        responses_input_masks = torch.reshape(responses_input_masks, (-1, seq_length)) #responses_input_masks.view(-1, seq_length)
+        responses_input_ids = responses_input_ids.view(-1, seq_length)
+        responses_input_masks = responses_input_masks.view(-1, seq_length)
 
         responses_vec = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:]  # [bs,dim]
         responses_vec = responses_vec.view(batch_size, res_cnt, -1)
 
         if labels is not None:
-            responses_vec = responses_vec#.squeeze(1)
+            responses_vec = responses_vec.squeeze(1)
             dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
             mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
-            loss = F.log_softmax(dot_product, dim=-1) * mask
+            loss = F.log_softmax(dot_product, dim=-1)
             loss = (-loss.sum(dim=1)).mean()
             return loss
         else:
@@ -70,7 +65,6 @@ class PolyEncoder(BertPreTrainedModel):
         super().__init__(config, *inputs, **kwargs)
         self.bert = kwargs['bert']
         self.poly_m = kwargs['poly_m']
-        self.tokenizer = kwargs['tokenizer']
         self.poly_code_embeddings = nn.Embedding(self.poly_m, config.hidden_size)
         # https://github.com/facebookresearch/ParlAI/blob/master/parlai/agents/transformer/polyencoder.py#L355
         torch.nn.init.normal_(self.poly_code_embeddings.weight, config.hidden_size ** -0.5)
@@ -88,13 +82,10 @@ class PolyEncoder(BertPreTrainedModel):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
         if labels is not None:
-            responses_input_ids = responses_input_ids[:, :2, :]#.unsqueeze(1)
-            responses_input_masks = responses_input_masks[:, :2, :]#.unsqueeze(1)
+            responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
+            responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
         batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
-        res_cnt = 2 #attention!!!!!!!!!!
-        print('responses:', responses_input_ids.shape)
 
-        
         # context encoder
         ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
         poly_code_ids = torch.arange(self.poly_m, dtype=torch.long).to(context_input_ids.device)
@@ -103,14 +94,10 @@ class PolyEncoder(BertPreTrainedModel):
         embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
 
         # response encoder
-        print(responses_input_ids.shape, responses_input_masks.shape)
-        print(seq_length)
-        responses_input_ids = torch.reshape(responses_input_ids, (-1, 32))
-        responses_input_masks = torch.reshape(responses_input_masks, (-1, 32))
-        print(responses_input_ids.shape, responses_input_masks.shape)
-        cand_emb = self.bert(responses_input_ids, responses_input_masks)[0]#[:,0,:] # [bs, dim]
+        responses_input_ids = responses_input_ids.view(-1, seq_length)
+        responses_input_masks = responses_input_masks.view(-1, seq_length)
+        cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
         cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
-        print('ok')
 
         # merge
         if labels is not None:
@@ -118,11 +105,11 @@ class PolyEncoder(BertPreTrainedModel):
             # we repeat responses for batch_size times to simulate test phase
             # so that every context is paired with batch_size responses
             cand_emb = cand_emb.permute(1, 0, 2) # [1, bs, dim]
-            #cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
+            cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
             ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
             dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
             mask = torch.eye(batch_size).to(context_input_ids.device) # [bs, bs]
-            loss = F.log_softmax(dot_product, dim=-1) * mask
+            loss = F.log_softmax(dot_product, dim=-1)
             loss = (-loss.sum(dim=1)).mean()
             return loss
         else:
