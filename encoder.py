@@ -30,7 +30,7 @@ class BiEncoder(BertPreTrainedModel):
             pt_candidates = responses_vec.squeeze(1)
             logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
             labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
-            loss = self.cross_entropy(logits, labels)
+            loss = nn.CrossEntropyLoss()(logits, labels)
             
             #responses_vec = responses_vec.squeeze(1)
             #dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
@@ -121,7 +121,7 @@ class PolyEncoder(BertPreTrainedModel):
             
             logits = (ctx_emb * pt_candidates).sum(-1)  # [bs, bs]
             labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
-            loss = self.cross_entropy(logits, labels)
+            loss = nn.CrossEntropyLoss()(logits, labels)
             
             return loss
         else:
