@@ -112,18 +112,18 @@ class PolyEncoder(BertPreTrainedModel):
             cand_emb = cand_emb.permute(1, 0, 2) # [1, bs, dim]
             cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
             ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
-            dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
-            C_negs = 1
-            mask = (torch.eye(batch_size) + C_negs) - torch.eye(batch_size)*C_negs # [bs, bs]
-            mask = mask.to(context_input_ids.device)
-            loss = F.log_softmax(dot_product, dim=-1) * mask
-            loss = (-loss.sum(dim=1)).mean() 
+            #dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
+            #C_negs = 1
+            #mask = (torch.eye(batch_size) + C_negs) - torch.eye(batch_size)*C_negs # [bs, bs]
+            #mask = mask.to(context_input_ids.device)
+            #loss = F.log_softmax(dot_product, dim=-1) * mask
+            #loss = (-loss.sum(dim=1)).mean() 
             
-            #pt_candidates = cand_emb.squeeze(1)
+            pt_candidates = cand_emb.squeeze(1)
             
-            #logits = (ctx_emb * pt_candidates).sum(-1)  # [bs, bs]
-            #labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
-            #loss = nn.CrossEntropyLoss()(logits, labels)
+            logits = (ctx_emb * pt_candidates).sum(-1)  # [bs, bs]
+            labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
+            loss = nn.CrossEntropyLoss()(logits, labels)
             
             return loss
         else:
