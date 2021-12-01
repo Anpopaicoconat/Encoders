@@ -9,6 +9,10 @@ class BiEncoder(BertPreTrainedModel):
     def __init__(self, config, *inputs, **kwargs):
         super().__init__(config, *inputs, **kwargs)
         self.bert = kwargs['bert']
+        try:
+            mod = kwargs['mod']
+        Except KeyError:
+            mod = 'None'
 
     def forward(self, context_input_ids, context_input_masks,
                             responses_input_ids, responses_input_masks, labels=None):
@@ -25,23 +29,26 @@ class BiEncoder(BertPreTrainedModel):
 
         responses_vec = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:]  # [bs,dim]
         responses_vec = responses_vec.view(batch_size, res_cnt, -1)
-
-        if labels is not None:
-            pt_candidates = responses_vec.squeeze(1)
-            logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
-            labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
-            loss = nn.CrossEntropyLoss()(logits, labels)
-            
-            #responses_vec = responses_vec.squeeze(1)
-            #dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
-            #mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
-            #loss = F.log_softmax(dot_product, dim=-1)
-            #loss = (-loss.sum(dim=1)).mean()
-            return loss
-        else:
+        if mod == 'inference':
             context_vec = context_vec.unsqueeze(1)
-            dot_product = torch.matmul(context_vec, responses_vec.permute(0, 2, 1)).squeeze()
-            return dot_product
+            return context_vec
+        else:
+            if labels is not None:
+                pt_candidates = responses_vec.squeeze(1)
+                logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
+                labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
+                loss = nn.CrossEntropyLoss()(logits, labels)
+
+                #responses_vec = responses_vec.squeeze(1)
+                #dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
+                #mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
+                #loss = F.log_softmax(dot_product, dim=-1)
+                #loss = (-loss.sum(dim=1)).mean()
+                return loss
+            else:
+                context_vec = context_vec.unsqueeze(1)
+                dot_product = torch.matmul(context_vec, responses_vec.permute(0, 2, 1)).squeeze()
+                return dot_product
 
 
 class CrossEncoder(BertPreTrainedModel):
@@ -58,11 +65,15 @@ class CrossEncoder(BertPreTrainedModel):
         text_vec = self.bert(text_input_ids, text_input_masks, text_input_segments)[0][:,0,:]  # [bs,dim]
         score = self.linear(text_vec)
         score = score.view(-1, neg)
-        if labels is not None:
-            loss = -F.log_softmax(score, -1)[:,0].mean()
-            return loss
+        if mod == 'inference':
+            context_vec = context_vec.unsqueeze(1)
+            return context_vec
         else:
-            return score
+            if labels is not None:
+                loss = -F.log_softmax(score, -1)[:,0].mean()
+                return loss
+            else:
+                return score
 
 
 class PolyEncoder(BertPreTrainedModel):
