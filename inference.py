@@ -53,8 +53,6 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
     
-    responses_base = []
-    
     for step, batch in enumerate(train_dataloader):
         batch = tuple(t.to(device) for t in batch[:2])
         if args.architecture == 'cross':
@@ -63,7 +61,6 @@ if __name__ == '__main__':
         else:
             context_token_ids_list_batch, context_input_masks_list_batch = batch
             out = model(context_token_ids_list_batch, context_input_masks_list_batch)
-            responses_base += out
-    responses_base = pd.DataFrame(responses_base)
-    responses_base.to_csv(parser.out_base)
+            print(out)
+    
     
