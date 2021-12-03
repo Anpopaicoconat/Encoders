@@ -53,7 +53,7 @@ if __name__ == '__main__':
     model.resize_token_embeddings(len(tokenizer)) 
     model.to(device)
     model.eval()
-    with open('eggs.csv', 'w', newline='') as csvfile:
+    with open('', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=' ',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
     
@@ -64,7 +64,7 @@ if __name__ == '__main__':
                 loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
             else:
                 context_token_ids_list_batch, context_input_masks_list_batch = batch
-                out = model(context_token_ids_list_batch, context_input_masks_list_batch)
+                out = model(context_token_ids_list_batch, context_input_masks_list_batch).detach().numpy()
                 for i in out:
                     writer.writerow(i)
     
