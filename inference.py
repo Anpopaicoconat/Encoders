@@ -53,7 +53,7 @@ if __name__ == '__main__':
     model.resize_token_embeddings(len(tokenizer)) 
     model.to(device)
     model.eval()
-    with open('', 'w', newline='') as csvfile:
+    with open(args.out_base, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=' ',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
     
