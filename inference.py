@@ -4,7 +4,7 @@ import pandas as pd
 
 import dataset
 import transform 
-import encoder 
+import encoder
 
 
 if __name__ == '__main__':
