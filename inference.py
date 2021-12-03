@@ -34,7 +34,6 @@ if __name__ == '__main__':
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bert_config = transformers.BertConfig.from_json_file(os.path.join(args.bert_model, 'config.json'))
-    bert_config.vocab_size = 119548
     previous_model_file = os.path.join(args.bert_model, 'pytorch_model.bin') 
     print('Loading parameters from', previous_model_file)
     model_state_dict = torch.load(previous_model_file, map_location="cpu")
