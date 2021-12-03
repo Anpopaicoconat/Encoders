@@ -38,7 +38,7 @@ if __name__ == '__main__':
     previous_model_file = os.path.join(args.bert_model, args.model_name) 
     print('Loading parameters from', previous_model_file)
     model_state_dict = torch.load(previous_model_file, map_location="cpu")
-    bert = transformers.BertModel.from_pretrained(previous_model_file, state_dict=model_state_dict)
+    bert = transformers.BertModel.from_pretrained(args.bert_model, state_dict=model_state_dict)
     del model_state_dict
     model.eval()
     if args.architecture == 'poly':
