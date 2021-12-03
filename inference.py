@@ -54,7 +54,7 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
     with open('eggs.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile, delimiter='/n',
+        writer = csv.writer(csvfile, delimiter=' ',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
     
         for step, batch in enumerate(train_dataloader):
