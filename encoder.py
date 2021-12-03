@@ -9,10 +9,6 @@ class BiEncoder(BertPreTrainedModel):
     def __init__(self, config, *inputs, **kwargs):
         super().__init__(config, *inputs, **kwargs)
         self.bert = kwargs['bert']
-        try:
-            mod = kwargs['mod']
-        Except KeyError:
-            mod = 'None'
 
     def forward(self, context_input_ids, context_input_masks,
                             responses_input_ids=None, responses_input_masks=None, labels=None):
