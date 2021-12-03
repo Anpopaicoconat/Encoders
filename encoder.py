@@ -18,7 +18,7 @@ class BiEncoder(BertPreTrainedModel):
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
 
         context_vec = self.bert(context_input_ids, context_input_masks)[0][:,0,:]  # [bs,dim]
-        if not responses_input_ids:
+        if responses_input_ids is None:
             return context_vec
         else:
             batch_size, res_cnt, seq_length = responses_input_ids.shape
