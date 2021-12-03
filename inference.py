@@ -37,7 +37,6 @@ if __name__ == '__main__':
     bert_config.vocab_size = 119548
     previous_model_file = os.path.join(args.bert_model, "pytorch_model.bin")
     print('Loading parameters from', previous_model_file)
-    log_wf.write('Loading parameters from %s' % previous_model_file + '\n')
     model_state_dict = torch.load(previous_model_file, map_location="cpu")
     bert = transformers.BertModel.from_pretrained('/content/bert/', state_dict=model_state_dict)
     del model_state_dict
