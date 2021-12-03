@@ -15,24 +15,23 @@ class BiEncoder(BertPreTrainedModel):
             mod = 'None'
 
     def forward(self, context_input_ids, context_input_masks,
-                            responses_input_ids, responses_input_masks, labels=None):
+                            responses_input_ids=None, responses_input_masks=None, labels=None):
         ## only select the first response (whose lbl==1)
         if labels is not None:
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
 
         context_vec = self.bert(context_input_ids, context_input_masks)[0][:,0,:]  # [bs,dim]
-
-        batch_size, res_cnt, seq_length = responses_input_ids.shape
-        responses_input_ids = responses_input_ids.view(-1, seq_length)
-        responses_input_masks = responses_input_masks.view(-1, seq_length)
-
-        responses_vec = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:]  # [bs,dim]
-        responses_vec = responses_vec.view(batch_size, res_cnt, -1)
-        if mod == 'inference':
-            context_vec = context_vec.unsqueeze(1)
+        if not responses_input_ids:
             return context_vec
         else:
+            batch_size, res_cnt, seq_length = responses_input_ids.shape
+            responses_input_ids = responses_input_ids.view(-1, seq_length)
+            responses_input_masks = responses_input_masks.view(-1, seq_length)
+
+            responses_vec = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:]  # [bs,dim]
+            responses_vec = responses_vec.view(batch_size, res_cnt, -1)
+
             if labels is not None:
                 pt_candidates = responses_vec.squeeze(1)
                 logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
@@ -45,6 +44,7 @@ class BiEncoder(BertPreTrainedModel):
                 #loss = F.log_softmax(dot_product, dim=-1)
                 #loss = (-loss.sum(dim=1)).mean()
                 return loss
+
             else:
                 context_vec = context_vec.unsqueeze(1)
                 dot_product = torch.matmul(context_vec, responses_vec.permute(0, 2, 1)).squeeze()
