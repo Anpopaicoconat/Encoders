@@ -12,6 +12,7 @@ import encoder
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--bert_model", default='ckpt/pretrained/bert-small-uncased', type=str)
+    parser.add_argument("--model_name", default='pytorch_model.bin', type=str)
     parser.add_argument("--architecture", required=True, type=str, help='[poly, bi, cross]')
     parser.add_argument("--poly_m", default=0, type=int, help="Number of m of polyencoder")
     parser.add_argument("--max_contexts_length", default=128, type=int)
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bert_config = transformers.BertConfig.from_json_file(os.path.join(args.bert_model, 'config.json'))
-    previous_model_file = os.path.join(args.bert_model, 'pytorch_model.bin') 
+    previous_model_file = os.path.join(args.bert_model, args.model_name) 
     print('Loading parameters from', previous_model_file)
     model_state_dict = torch.load(previous_model_file, map_location="cpu")
     bert = transformers.BertModel.from_pretrained(previous_model_file, state_dict=model_state_dict)
