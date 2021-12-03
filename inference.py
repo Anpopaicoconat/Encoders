@@ -55,9 +55,11 @@ if __name__ == '__main__':
     model.eval()
     with open(args.out_base, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=' ',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                            quotechar='"', quoting=csv.QUOTE_MINIMAL)
     
         for step, batch in enumerate(train_dataloader):
+            if step%10==0:
+                print(step)
             batch = tuple(t.to(device) for t in batch[:2])
             if args.architecture == 'cross':
                 text_token_ids_list_batch, text_input_masks_list_batch = batch
