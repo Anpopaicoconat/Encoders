@@ -30,7 +30,7 @@ if __name__ == '__main__':
     
     train_dataset = dataset.SelectionDataset(os.path.join(args.train_dir, 'train.txt'),
                                                                   context_transform, response_transform, concat_transform, sample_cnt=None, mode=args.architecture)
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=args.train_batch_size, collate_fn=train_dataset.batchify_join_str, shuffle=True, num_workers=0)
+    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, collate_fn=train_dataset.batchify_join_str, shuffle=True, num_workers=0)
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bert_config = transformers.BertConfig.from_json_file(os.path.join(args.bert_model, 'config.json'))
