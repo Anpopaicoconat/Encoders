@@ -52,15 +52,19 @@ if __name__ == '__main__':
     model.resize_token_embeddings(len(tokenizer)) 
     model.to(device)
     model.eval()
+    with open('eggs.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter='/n',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
     
-    for step, batch in enumerate(train_dataloader):
-        batch = tuple(t.to(device) for t in batch[:2])
-        if args.architecture == 'cross':
-            text_token_ids_list_batch, text_input_masks_list_batch = batch
-            loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
-        else:
-            context_token_ids_list_batch, context_input_masks_list_batch = batch
-            out = model(context_token_ids_list_batch, context_input_masks_list_batch)
-            print(out)
+        for step, batch in enumerate(train_dataloader):
+            batch = tuple(t.to(device) for t in batch[:2])
+            if args.architecture == 'cross':
+                text_token_ids_list_batch, text_input_masks_list_batch = batch
+                loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
+            else:
+                context_token_ids_list_batch, context_input_masks_list_batch = batch
+                out = model(context_token_ids_list_batch, context_input_masks_list_batch)
+                for i in out:
+                    spamwriter.writerow(i)
     
     
