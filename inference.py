@@ -41,7 +41,6 @@ if __name__ == '__main__':
     model_state_dict = torch.load(previous_model_file, map_location="cpu")
     bert = transformers.BertModel.from_pretrained(args.bert_model, state_dict=model_state_dict)
     del model_state_dict
-    model.eval()
     if args.architecture == 'poly':
         model = encoder.PolyEncoder(bert_config, bert=bert, poly_m=args.poly_m, tokenizer=tokenizer)
     elif args.architecture == 'bi':
@@ -52,6 +51,7 @@ if __name__ == '__main__':
         raise Exception('Unknown architecture.')
     model.resize_token_embeddings(len(tokenizer)) 
     model.to(device)
+    model.eval()
     
     responses_base = []
     
