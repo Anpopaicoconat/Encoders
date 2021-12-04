@@ -61,7 +61,7 @@ if __name__ == '__main__':
     batch = torch.tensor([context_transform(dialog_history)])
     batch = tuple(t.to(device) for t in batch)
     if args.architecture == 'cross':
-        rise Exception('not implemented yet')
+        raise Exception('not implemented yet')
         text_token_ids_list_batch, text_input_masks_list_batch = batch
         loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
     else:
