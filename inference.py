@@ -58,7 +58,7 @@ if __name__ == '__main__':
     inp_string = input('user: ')
     dialog_history.append(inp_string)
     ########################
-    batch = torch.tensor([context_transform(dialog_history)])
+    batch = context_transform(dialog_history)
     batch = tuple(t.to(device) for t in batch)
     if args.architecture == 'cross':
         raise Exception('not implemented yet')
