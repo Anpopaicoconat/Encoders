@@ -66,6 +66,7 @@ if __name__ == '__main__':
             else:
                 context_token_ids_list_batch, context_input_masks_list_batch = batch
                 out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
+                context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().numpy()
                 for ids, embd in zip(context_token_ids_list_batch, out):
                     string = '{}|||{}\n'.format(ids, embd)
                     base.write(string)
