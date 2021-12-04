@@ -86,6 +86,8 @@ async def get_text_messages(msg: types.Message):
     if msg.text == '!end':
         global dialog_history
         dialog_history = []  
+        await msg.answer('Конец беседы')
+        
     dialog_history.append(inp_string)
     ########################
     batch = context_transform(dialog_history)
