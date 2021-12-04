@@ -71,6 +71,5 @@ if __name__ == '__main__':
                     base.write(string)
             if step%10==0:
                 print(step, L)
-                print(string)
     
     
