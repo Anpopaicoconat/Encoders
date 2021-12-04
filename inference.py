@@ -3,12 +3,25 @@ import transformers
 import pandas as pd
 import argparse
 import os
-import csv
+import numpy as np
 
 import dataset
 import transform 
 import encoder
 
+def token_proc(token, st):
+    if st and token[0]=='[' and token[-1]==']':
+        token=''
+    elif token[:2]!='##':
+        token = ' '+token
+    else:
+        token = token[2:]
+    return token
+def convert_ids_to_str(ids, tokenizer, st=False):
+    tokens = tokenizer.convert_ids_to_tokens(ids['input_ids'])
+    print(tokens)
+    tokens = list(map(lambda x:token_proc(x, st), tokens))
+    return ''.join(tokens)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -68,4 +81,25 @@ if __name__ == '__main__':
         context_token_ids_list_batch, context_input_masks_list_batch = batch
         out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
         print(out.shape)
-    
+        relevant_response = [None]
+        relevant_sim = [0]
+        with open(out_base, 'r') as base:
+            L = len(base)
+            for step, i in enumerate(base):
+                ids, embd = i.split('|||')
+                ids = np.array(ids.split(' '))
+                embd = np.array(embd.split(' '))
+                cos_sim = np.matmul(out, embd)
+                if cos_sim > relevant_sim[-1]:
+                    relevant_sim.append(cos_sim)
+                    relevant_response.append(ids)
+                if len(relevant_response)>10:
+                    relevant_response = relevant_response[1:]
+                    relevant_sim = relevant_sim[1:]
+                if step%10==0:
+                    print(step, L, len(relevant_response))
+        responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
+        print(responce)
+        
+                        
+                
