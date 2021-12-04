@@ -115,7 +115,7 @@ async def get_text_messages(msg: types.Message):
                     relevant_sim = relevant_sim[1:]
         responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
         dialog_history.append(responce)
-    await msg.answer(ыек(dialog_history)+'\n'+responce)
+    await msg.answer(str(dialog_history)+'\n'+responce)
       
 if __name__ == '__main__':
    executor.start_polling(dp)
