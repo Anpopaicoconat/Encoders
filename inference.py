@@ -83,7 +83,7 @@ if __name__ == '__main__':
         print(out.shape)
         relevant_response = [None]
         relevant_sim = [0]
-        with open(out_base, 'r') as base:
+        with open(args.out_base, 'r') as base:
             L = len(base)
             for step, i in enumerate(base):
                 ids, embd = i.split('|||')
