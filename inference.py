@@ -59,7 +59,7 @@ if __name__ == '__main__':
     dialog_history.append(inp_string)
     ########################
     batch = context_transform(dialog_history)
-    batch = tuple(t.to(device) for t in batch)
+    batch = tuple(torch.tensor([t]).to(device) for t in batch)
     if args.architecture == 'cross':
         raise Exception('not implemented yet')
         text_token_ids_list_batch, text_input_masks_list_batch = batch
