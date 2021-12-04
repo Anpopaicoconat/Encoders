@@ -84,9 +84,6 @@ if __name__ == '__main__':
 async def get_text_messages(msg: types.Message):
     inp_string = msg.text
     dialog_history = []
-    inp_string = None
-    
-    inp_string = input('user: ')
     dialog_history.append(inp_string)
     ########################
     batch = context_transform(dialog_history)
