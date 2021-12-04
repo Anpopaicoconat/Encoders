@@ -84,7 +84,7 @@ if __name__ == '__main__':
         relevant_response = [None]
         relevant_sim = [0]
         with open(args.out_base, 'r') as base:
-            L = len(base)
+            
             for step, i in enumerate(base):
                 ids, embd = i.split('|||')
                 ids = np.array(ids.split(' '))
@@ -97,7 +97,7 @@ if __name__ == '__main__':
                     relevant_response = relevant_response[1:]
                     relevant_sim = relevant_sim[1:]
                 if step%10==0:
-                    print(step, L, len(relevant_response))
+                    print(step, len(relevant_response))
         responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
         print(responce)
         
