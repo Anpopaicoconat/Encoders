@@ -85,7 +85,7 @@ if __name__ == '__main__':
         relevant_sim = [0]
         with open(args.out_base, 'r') as base:
             
-            for step, i in enumerate(base):
+            for step, i in enumerate(base.readlines()):
                 ids, embd = i.split('|||')
                 ids = np.array(ids.split(' '))
                 embd = np.array(embd.split(' '))
