@@ -18,7 +18,7 @@ def token_proc(token, st):
         token = token[2:]
     return token
 def convert_ids_to_str(ids, tokenizer, st=False):
-    tokens = tokenizer.convert_ids_to_tokens(ids['input_ids'])
+    tokens = tokenizer.convert_ids_to_tokens(ids)
     print(tokens)
     tokens = list(map(lambda x:token_proc(x, st), tokens))
     return ''.join(tokens)
