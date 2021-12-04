@@ -79,7 +79,8 @@ if __name__ == '__main__':
     
             
             
-dialog_history = []    
+dialog_history = []
+print('ready')
 @dp.message_handler(content_types=['text'])
 async def get_text_messages(msg: types.Message):
     inp_string = msg.text
