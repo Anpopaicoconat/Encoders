@@ -53,9 +53,8 @@ if __name__ == '__main__':
     model.resize_token_embeddings(len(tokenizer)) 
     model.to(device)
     model.eval()
-    with open(args.out_base, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile, delimiter=' ',
-                            quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    
+    with open(args.out_base, 'w') as base:
         L = len(train_dataloader)
         for step, batch in enumerate(train_dataloader):
             if step%10==0:
@@ -67,7 +66,8 @@ if __name__ == '__main__':
             else:
                 context_token_ids_list_batch, context_input_masks_list_batch = batch
                 out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
-                for i in out:
-                    writer.writerow(i)
+                for ids, embd in zip(context_token_ids_list_batch, out):
+                    string = '{}|||{}\n'.format(ids, embd)
+                    base.write(string)
     
     
