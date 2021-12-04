@@ -57,7 +57,7 @@ if __name__ == '__main__':
     with open(args.out_base, 'w') as base:
         L = len(train_dataloader)
         for step, batch in enumerate(train_dataloader):
-            batch = tuple(t.to(device) for t in batch[:2])
+            batch = tuple(t.to(device) for t in batch[2:4])
             if args.architecture == 'cross':
                 text_token_ids_list_batch, text_input_masks_list_batch = batch
                 loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
