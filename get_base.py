@@ -57,8 +57,6 @@ if __name__ == '__main__':
     with open(args.out_base, 'w') as base:
         L = len(train_dataloader)
         for step, batch in enumerate(train_dataloader):
-            if step%10==0:
-                print(step, L)
             batch = tuple(t.to(device) for t in batch[:2])
             if args.architecture == 'cross':
                 text_token_ids_list_batch, text_input_masks_list_batch = batch
@@ -69,6 +67,10 @@ if __name__ == '__main__':
                 context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tolist()
                 for ids, embd in zip(context_token_ids_list_batch, out):
                     string = '{}|||{}'.format(ids, embd).replace('\n', ' ').replace('\r', ' ') + '\n'
+    
                     base.write(string)
+            if step%10==0:
+                print(step, L)
+                print(string)
     
     
