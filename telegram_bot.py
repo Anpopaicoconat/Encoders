@@ -79,11 +79,13 @@ if __name__ == '__main__':
     
             
             
-    
+dialog_history = []    
 @dp.message_handler(content_types=['text'])
 async def get_text_messages(msg: types.Message):
     inp_string = msg.text
-    dialog_history = []
+    if msg.text == '!end':
+        global dialog_history
+        dialog_history = []  
     dialog_history.append(inp_string)
     ########################
     batch = context_transform(dialog_history)
