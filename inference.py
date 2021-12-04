@@ -19,7 +19,7 @@ def token_proc(token, st):
     return token
 def convert_ids_to_str(ids, tokenizer, st=False):
     tokens = tokenizer.convert_ids_to_tokens(ids)
-    print(tokens)
+    #print(tokens)
     tokens = list(map(lambda x:token_proc(x, st), tokens))
     return ''.join(tokens)
 
@@ -68,38 +68,38 @@ if __name__ == '__main__':
     model.eval()
     ########################
     dialog_history = []
-    inp_string = input('user: ')
-    dialog_history.append(inp_string)
-    ########################
-    batch = context_transform(dialog_history)
-    batch = tuple(torch.tensor([t]).to(device) for t in batch)
-    if args.architecture == 'cross':
-        raise Exception('not implemented yet')
-        text_token_ids_list_batch, text_input_masks_list_batch = batch
-        loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
-    else:
-        context_token_ids_list_batch, context_input_masks_list_batch = batch
-        out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
-        print(out.shape)
-        relevant_response = [None]
-        relevant_sim = [0]
-        with open(args.out_base, 'r') as base:
-            
-            for step, i in enumerate(base.readlines()):
-                ids, embd = i.split('|||')
-                ids = np.array([float(i) for i in ids.split(' ')])
-                embd = np.array([float(i) for i in embd.split(' ')])
-                cos_sim = np.matmul(out, embd)
-                if cos_sim > relevant_sim[-1]:
-                    relevant_sim.append(cos_sim)
-                    relevant_response.append(ids)
-                if len(relevant_response)>10:
-                    relevant_response = relevant_response[1:]
-                    relevant_sim = relevant_sim[1:]
-                if step%10==0:
-                    print(step, len(relevant_response))
-        responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
-        print(responce)
-        
+    inp_string = None
+    while inp_string != 'user: !end':
+        inp_string = input('user: ')
+        dialog_history.append(inp_string)
+        ########################
+        batch = context_transform(dialog_history)
+        batch = tuple(torch.tensor([t]).to(device) for t in batch)
+        if args.architecture == 'cross':
+            raise Exception('not implemented yet')
+            text_token_ids_list_batch, text_input_masks_list_batch = batch
+            loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
+        else:
+            context_token_ids_list_batch, context_input_masks_list_batch = batch
+            out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
+            print(out.shape)
+            relevant_response = [None]
+            relevant_sim = [0]
+            with open(args.out_base, 'r') as base:
+
+                for step, i in enumerate(base.readlines()):
+                    ids, embd = i.split('|||')
+                    ids = np.array([float(i) for i in ids.split(' ')])
+                    embd = np.array([float(i) for i in embd.split(' ')])
+                    cos_sim = np.matmul(out, embd)
+                    if cos_sim > relevant_sim[-1]:
+                        relevant_sim.append(cos_sim)
+                        relevant_response.append(ids)
+                    if len(relevant_response)>10:
+                        relevant_response = relevant_response[1:]
+                        relevant_sim = relevant_sim[1:]
+            responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
+            print(responce)
+            dialog_history.append(responce)
                         
                 
