@@ -87,8 +87,8 @@ if __name__ == '__main__':
             
             for step, i in enumerate(base.readlines()):
                 ids, embd = i.split('|||')
-                ids = np.array(ids.split(' '))
-                embd = np.array(embd.split(' '))
+                ids = np.array([float(i) for i in ids.split(' ')])
+                embd = np.array([float(i) for i in embd.split(' ')])
                 cos_sim = np.matmul(out, embd)
                 if cos_sim > relevant_sim[-1]:
                     relevant_sim.append(cos_sim)
