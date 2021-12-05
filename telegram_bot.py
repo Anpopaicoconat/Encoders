@@ -122,7 +122,7 @@ async def get_text_messages(msg: types.Message):
         if inp_string[0] == '!':
             await msg.answer(str(dialog_history)+'\n'+responce)
         else:
-            await msg.answer(responce[:14])
+            await msg.answer(responce[:18])
       
 if __name__ == '__main__':
    executor.start_polling(dp)
