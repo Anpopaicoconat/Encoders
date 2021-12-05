@@ -88,37 +88,41 @@ async def get_text_messages(msg: types.Message):
         global dialog_history
         dialog_history = []  
         await msg.answer('Конец беседы')
-        
-    dialog_history.append(inp_string)
-    ########################
-    batch = context_transform(dialog_history)
-    batch = tuple(torch.tensor([t]).to(device) for t in batch)
-    if args.architecture == 'cross':
-        raise Exception('not implemented yet')
-        text_token_ids_list_batch, text_input_masks_list_batch = batch
-        loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
     else:
-        context_token_ids_list_batch, context_input_masks_list_batch = batch
-        out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
-        print(out.shape)
-        relevant_response = [None]
-        relevant_sim = [0]
-        with open(args.out_base, 'r') as base:
+        
+        dialog_history.append(inp_string)
+        ########################
+        batch = context_transform(dialog_history)
+        batch = tuple(torch.tensor([t]).to(device) for t in batch)
+        if args.architecture == 'cross':
+            raise Exception('not implemented yet')
+            text_token_ids_list_batch, text_input_masks_list_batch = batch
+            loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
+        else:
+            context_token_ids_list_batch, context_input_masks_list_batch = batch
+            out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
+            print(out.shape)
+            relevant_response = [None]
+            relevant_sim = [0]
+            with open(args.out_base, 'r') as base:
 
-            for step, i in enumerate(base.readlines()):
-                ids, embd = i.split('|||')
-                ids = np.array([float(i) for i in ids.split(' ')])
-                embd = np.array([float(i) for i in embd.split(' ')])
-                cos_sim = np.matmul(out, embd)
-                if cos_sim > relevant_sim[-1]:
-                    relevant_sim.append(cos_sim)
-                    relevant_response.append(ids)
-                if len(relevant_response)>10:
-                    relevant_response = relevant_response[1:]
-                    relevant_sim = relevant_sim[1:]
-        responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
-        dialog_history.append(responce)
-    await msg.answer(str(dialog_history)+'\n'+responce)
+                for step, i in enumerate(base.readlines()):
+                    ids, embd = i.split('|||')
+                    ids = np.array([float(i) for i in ids.split(' ')])
+                    embd = np.array([float(i) for i in embd.split(' ')])
+                    cos_sim = np.matmul(out, embd)
+                    if cos_sim > relevant_sim[-1]:
+                        relevant_sim.append(cos_sim)
+                        relevant_response.append(ids)
+                    if len(relevant_response)>10:
+                        relevant_response = relevant_response[1:]
+                        relevant_sim = relevant_sim[1:]
+            responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
+            dialog_history.append(responce)
+        if inp_string[0] == '!'
+            await msg.answer(str(dialog_history)+'\n'+responce)
+        else:
+            await msg.answer([:14]responce)
       
 if __name__ == '__main__':
    executor.start_polling(dp)
