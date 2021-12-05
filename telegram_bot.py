@@ -119,7 +119,7 @@ async def get_text_messages(msg: types.Message):
                         relevant_sim = relevant_sim[1:]
             responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
             dialog_history.append(responce)
-        if inp_string[0] == '!'
+        if inp_string[0] == '!':
             await msg.answer(str(dialog_history)+'\n'+responce)
         else:
             await msg.answer([:14]responce)
