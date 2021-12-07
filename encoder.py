@@ -114,7 +114,7 @@ class PolyEncoder(BertPreTrainedModel):
                 
 
         # response encoder
-        if mod!='inferece':
+        if mod!='inference':
             responses_input_ids = responses_input_ids.view(-1, seq_length)
             responses_input_masks = responses_input_masks.view(-1, seq_length)
             cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
