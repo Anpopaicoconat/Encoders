@@ -105,6 +105,7 @@ if __name__ == '__main__':
             raise Exception('not implemented yet')
             text_token_ids_list_batch, text_input_masks_list_batch = batch
             loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
+            
         elif args.architecture == 'poly':
             context_token_ids_list_batch, context_input_masks_list_batch = batch
             with open(args.out_base, 'r') as base:
@@ -122,9 +123,9 @@ if __name__ == '__main__':
                         embd_batch = torch.tensor(embd_batch, dtype=torch.float).to(device)
                         print(embd_batch)
                         out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch, mod='inference').cpu().detach().numpy()[0]# [n_cand: n_cand] поэтому берем 0
-                        print(out)
                         outmax = max(out)
                         if outmax > relevant_sim:
+                            print('out', out)
                             print('new', outmax)
                             relevant_sim = outmax
                             max_i = np.argmax(out)
