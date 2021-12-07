@@ -96,7 +96,6 @@ class PolyEncoder(BertPreTrainedModel):
         if labels is not None or mod == 'get_base':
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
-        print(responses_input_ids)
         if mod != 'inference':
             batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
         else:
