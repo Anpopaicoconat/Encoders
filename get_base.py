@@ -9,6 +9,19 @@ import dataset
 import transform 
 import encoder
 
+def token_proc(token, st):
+    if st and token[0]=='[' and token[-1]==']':
+        token=''
+    elif token[:2]!='##':
+        token = ' '+token
+    else:
+        token = token[2:]
+    return token
+def convert_ids_to_str(ids, tokenizer, st=False):
+    tokens = tokenizer.convert_ids_to_tokens(ids)
+    #print(tokens)
+    tokens = list(map(lambda x:token_proc(x, st), tokens))
+    return ''.join(tokens)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -61,6 +74,19 @@ if __name__ == '__main__':
             if args.architecture == 'cross':
                 text_token_ids_list_batch, text_input_masks_list_batch = batch
                 loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
+                
+            elif args.architecture == 'poly':
+                candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
+                out = model(candidates_token_ids_list_batch, candidates_input_masks_list_batch).cpu().detach().tolist()
+                context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tolist()
+                for ids, embd in zip(context_token_ids_list_batch, out):
+                    
+                    #responces = convert_ids_to_str(relevant_response[-1], tokenizer, True)
+                    string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
+                    base.write(string)
+                if step%10==0:
+                    print(step, L)
+                    
             else:
                 context_token_ids_list_batch, context_input_masks_list_batch = batch
                 out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().tolist()
