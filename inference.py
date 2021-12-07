@@ -122,7 +122,7 @@ if __name__ == '__main__':
                         embd_batch = [torch.tensor(e).to(device) for e in embd_batch]
                         print(embd_batch)
                         embd_batch=[]
-                        out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch).cpu().detach().numpy()
+                        out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch, mod='inference').cpu().detach().numpy()
                         outmax = max(out)
                         if outmax > relevant_sim:
                             print('new', outmax)
