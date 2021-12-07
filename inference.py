@@ -118,7 +118,7 @@ if __name__ == '__main__':
                     embd = np.array([float(i) for i in embd.split(' ')])
                     embd_batch.append(embd)
                     ids_batch.append(ids)
-                    if step % batch_size == 0:
+                    if step % args.batch_size == 0:
                         print(i)
                         embd_batch=[]
                         out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch).cpu().detach().numpy()
