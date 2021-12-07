@@ -84,6 +84,7 @@ if __name__ == '__main__':
                 for ids, embd in zip(candidates_token_ids_list_batch, out):
                     
                     #responces = convert_ids_to_str(relevant_response[-1], tokenizer, True)
+                    print(embd)
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
                     base.write(string)
                 if step%10==0:
