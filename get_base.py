@@ -79,7 +79,7 @@ if __name__ == '__main__':
                 candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
                 out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch).cpu().detach().tolist()
                 candidates_token_ids_list_batch = candidates_token_ids_list_batch.cpu().detach().tolist()
-                for ids, embd in zip(context_token_ids_list_batch, out):
+                for ids, embd in zip(candidates_token_ids_list_batch, out):
                     
                     #responces = convert_ids_to_str(relevant_response[-1], tokenizer, True)
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
