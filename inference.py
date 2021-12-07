@@ -23,6 +23,32 @@ def convert_ids_to_str(ids, tokenizer, st=False):
     tokens = list(map(lambda x:token_proc(x, st), tokens))
     return ''.join(tokens)
 
+    ## init dataset and bert model
+    tokenizer = transformers.BertTokenizerFast.from_pretrained(os.path.join(args.bert_model, "vocab.txt"), do_lower_case=True, clean_text=False, truncation=True)
+    context_transform = transform.SelectionJoinTransform(tokenizer=tokenizer, max_len=args.max_contexts_length)
+    response_transform = transform.SelectionSequentialTransform(tokenizer=tokenizer, max_len=args.max_response_length)
+    concat_transform = transform.SelectionConcatTransform(tokenizer=tokenizer, max_len=args.max_response_length+args.max_contexts_length)
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    bert_config = transformers.BertConfig.from_json_file(os.path.join(args.bert_model, 'config.json'))
+    previous_model_file = os.path.join(args.bert_model, args.model_name) 
+    print('Loading parameters from', previous_model_file)
+    model_state_dict = torch.load(previous_model_file, map_location="cpu")
+    bert = transformers.BertModel.from_pretrained(args.bert_model, state_dict=model_state_dict)
+    del model_state_dict
+    if args.architecture == 'poly':
+        model = encoder.PolyEncoder(bert_config, bert=bert, poly_m=args.poly_m, tokenizer=tokenizer)
+    elif args.architecture == 'bi':
+        pass
+        #model = encoder.BiEncoder(bert_config, bert=bert)
+    elif args.architecture == 'cross':
+        model = encoder.CrossEncoder(bert_config, bert=bert)
+    else:
+        raise Exception('Unknown architecture.')
+    model.resize_token_embeddings(len(tokenizer)) 
+    model.to(device)
+    model.eval()
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--bert_model", default='ckpt/pretrained/bert-small-uncased', type=str)
@@ -79,6 +105,14 @@ if __name__ == '__main__':
             raise Exception('not implemented yet')
             text_token_ids_list_batch, text_input_masks_list_batch = batch
             loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
+        elif args.architecture == 'poly':
+            context_token_ids_list_batch, context_input_masks_list_batch = batch
+            with open(args.out_base, 'r') as base:
+                for step, i in enumerate(base.readlines()):
+                    ids, embd = i.split('|||')
+                    ids = np.array([float(i) for i in ids.split(' ')])
+                    embd = np.array([float(i) for i in embd.split(' ')])
+                    
         else:
             context_token_ids_list_batch, context_input_masks_list_batch = batch
             out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
