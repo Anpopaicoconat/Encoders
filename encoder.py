@@ -112,7 +112,7 @@ class PolyEncoder(BertPreTrainedModel):
             responses_input_masks = responses_input_masks.view(-1, seq_length)
             cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
             cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
-            if context_input_ids is None:
+            if context_input_ids is in int:
                 return cand_emb
 
         # merge
