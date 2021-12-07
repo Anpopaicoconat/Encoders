@@ -85,8 +85,6 @@ if __name__ == '__main__':
                     ids=ids[0]
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
                     base.write(string)
-                if step%10==0:
-                    print(step, L)
                     
             else:
                 context_token_ids_list_batch, context_input_masks_list_batch = batch
