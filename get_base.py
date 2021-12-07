@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 
             elif args.architecture == 'poly':
                 candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
-                out = model(responses_input_ids=candidates_token_ids_list_batch, cresponses_input_masks=andidates_input_masks_list_batch).cpu().detach().tolist()
+                out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch).cpu().detach().tolist()
                 context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tolist()
                 for ids, embd in zip(context_token_ids_list_batch, out):
                     
