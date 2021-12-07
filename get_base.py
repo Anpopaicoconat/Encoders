@@ -82,10 +82,10 @@ if __name__ == '__main__':
                 
                 candidates_token_ids_list_batch = candidates_token_ids_list_batch.cpu().detach().tolist()
                 for ids, embd in zip(candidates_token_ids_list_batch, out):
-                    
-                    #responces = convert_ids_to_str(relevant_response[-1], tokenizer, True)
-                    print(np.array(embd).shape)
+                    print(np.array(embd).shape, np.array(ids).shape)
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
+                    print(string)
+                    print()
                     base.write(string)
                 if step%10==0:
                     print(step, L)
