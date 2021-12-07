@@ -99,11 +99,12 @@ class PolyEncoder(BertPreTrainedModel):
         batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
 
         # context encoder
-        ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
-        poly_code_ids = torch.arange(self.poly_m, dtype=torch.long).to(context_input_ids.device)
-        poly_code_ids = poly_code_ids.unsqueeze(0).expand(batch_size, self.poly_m)
-        poly_codes = self.poly_code_embeddings(poly_code_ids) # [bs, poly_m, dim]
-        embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
+        if context_input_ids is not None:
+            ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
+            poly_code_ids = torch.arange(self.poly_m, dtype=torch.long).to(context_input_ids.device)
+            poly_code_ids = poly_code_ids.unsqueeze(0).expand(batch_size, self.poly_m)
+            poly_codes = self.poly_code_embeddings(poly_code_ids) # [bs, poly_m, dim]
+            embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
 
         # response encoder
         if responses_input_ids is not None:
