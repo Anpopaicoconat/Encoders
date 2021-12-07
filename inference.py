@@ -129,7 +129,7 @@ if __name__ == '__main__':
                             print('new', outmax)
                             relevant_sim = outmax
                             max_i = np.argmax(out)
-                            relevant_response = embd_batch[max_i]
+                            relevant_response = ids_batch[max_i]
                             print(convert_ids_to_str(relevant_response, tokenizer, True))
                         embd_batch=[]
             responce = convert_ids_to_str(relevant_response, tokenizer, True)
