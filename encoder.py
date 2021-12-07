@@ -93,7 +93,7 @@ class PolyEncoder(BertPreTrainedModel):
                             responses_input_ids=None, responses_input_masks=None, labels=None, mode=train):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
-        if labels is not None:
+        if labels is not None and mod != 'inferece':
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
         batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
@@ -105,18 +105,20 @@ class PolyEncoder(BertPreTrainedModel):
             poly_code_ids = poly_code_ids.unsqueeze(0).expand(batch_size, self.poly_m)
             poly_codes = self.poly_code_embeddings(poly_code_ids) # [bs, poly_m, dim]
             embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
+            if mod == 'inferece':
+                
 
         # response encoder
         if mode!='inferece':
             responses_input_ids = responses_input_ids.view(-1, seq_length)
             responses_input_masks = responses_input_masks.view(-1, seq_length)
             cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
-            cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
-            if context_input_ids is None:
+            if context_input_ids is None or mode == 'get_base':
                 return cand_emb
-        else:
+            cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
+            
+        elif:
             cand_emb = responses_input_ids
-            responses_input_masks = responses_input_masks
         # merge
         if labels is not None:
             # we are recycling responses for faster training
@@ -127,8 +129,9 @@ class PolyEncoder(BertPreTrainedModel):
             
             ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
             pt_candidates = cand_emb.squeeze(1)
-            
             logits = (ctx_emb * pt_candidates).sum(-1)  # [bs, bs]
+            if mod == 'inference':
+                return logits
             labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
             loss = nn.CrossEntropyLoss()(logits, labels)
             
