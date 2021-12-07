@@ -118,7 +118,7 @@ class PolyEncoder(BertPreTrainedModel):
                 return cand_emb
             cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
             
-        elif mod == 'inferece'::
+        elif mod == 'inferece':
             cand_emb = responses_input_ids
         # merge
         if labels is not None:
