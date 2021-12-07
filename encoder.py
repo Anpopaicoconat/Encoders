@@ -96,11 +96,10 @@ class PolyEncoder(BertPreTrainedModel):
         if labels is not None or mod == 'get_base':
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
-        if mod != 'inference':
-            batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
-        else:
-            batch_size, seq_length = responses_input_ids.shape # res_cnt is 1 during training
-            res_cnt = 1
+
+        batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
+        
+
         # context encoder
         if context_input_ids is not None:
             ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
@@ -108,21 +107,18 @@ class PolyEncoder(BertPreTrainedModel):
             poly_code_ids = poly_code_ids.unsqueeze(0).expand(batch_size, self.poly_m)
             poly_codes = self.poly_code_embeddings(poly_code_ids) # [bs, poly_m, dim]
             embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
-            if mod == 'inferece':
-                pass
-                
 
         # response encoder
-        if mod!='inference':
+        if mod == 'inference':
+            cand_emb = responses_input_ids
+        else:
             responses_input_ids = responses_input_ids.view(-1, seq_length)
             responses_input_masks = responses_input_masks.view(-1, seq_length)
             cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
-            if context_input_ids is None or mod == 'get_base':
+            if mod == 'get_base':
                 return cand_emb
             cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
-            
-        elif mod == 'inference':
-            cand_emb = responses_input_ids
+
         # merge
         if labels is not None:
             # we are recycling responses for faster training
@@ -130,15 +126,11 @@ class PolyEncoder(BertPreTrainedModel):
             # so that every context is paired with batch_size responses
             cand_emb = cand_emb.permute(1, 0, 2) # [1, bs, dim]
             cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
-            
             ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
-            pt_candidates = cand_emb.squeeze(1)
-            logits = (ctx_emb * pt_candidates).sum(-1)  # [bs, bs]
-            if mod == 'inference':
-                return logits
-            labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
-            loss = nn.CrossEntropyLoss()(logits, labels)
-            
+            dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
+            mask = torch.eye(batch_size).to(context_input_ids.device) # [bs, bs]
+            loss = F.log_softmax(dot_product, dim=-1) * mask
+            loss = (-loss.sum(dim=1)).mean()
             return loss
         else:
             ctx_emb = self.dot_attention(cand_emb, embs, embs) # [bs, res_cnt, dim]
