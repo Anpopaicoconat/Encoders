@@ -90,7 +90,7 @@ class PolyEncoder(BertPreTrainedModel):
         return output
 
     def forward(self, context_input_ids=None, context_input_masks=None,
-                            responses_input_ids=None, responses_input_masks=None, labels=None, mode=train):
+                            responses_input_ids=None, responses_input_masks=None, labels=None, mod=train):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
         if labels is not None and mod != 'inferece':
@@ -106,18 +106,19 @@ class PolyEncoder(BertPreTrainedModel):
             poly_codes = self.poly_code_embeddings(poly_code_ids) # [bs, poly_m, dim]
             embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
             if mod == 'inferece':
+                pass
                 
 
         # response encoder
-        if mode!='inferece':
+        if mod!='inferece':
             responses_input_ids = responses_input_ids.view(-1, seq_length)
             responses_input_masks = responses_input_masks.view(-1, seq_length)
             cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
-            if context_input_ids is None or mode == 'get_base':
+            if context_input_ids is None or mod == 'get_base':
                 return cand_emb
             cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
             
-        elif:
+        elif mod ='inferece'::
             cand_emb = responses_input_ids
         # merge
         if labels is not None:
