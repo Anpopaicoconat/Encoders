@@ -90,7 +90,7 @@ class PolyEncoder(BertPreTrainedModel):
         return output
 
     def forward(self, context_input_ids=None, context_input_masks=None,
-                            responses_input_ids=None, responses_input_masks=None, labels=None, mod=train):
+                            responses_input_ids=None, responses_input_masks=None, labels=None, mod='train'):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
         if labels is not None and mod != 'inferece':
