@@ -10,7 +10,7 @@ class BiEncoder(BertPreTrainedModel):
         super().__init__(config, *inputs, **kwargs)
         self.bert = kwargs['bert']
 
-    def forward(self, context_input_ids, context_input_masks,
+    def forward(self, context_input_ids=None, context_input_masks=None,
                             responses_input_ids=None, responses_input_masks=None, labels=None):
         ## only select the first response (whose lbl==1)
         if labels is not None:
@@ -89,8 +89,8 @@ class PolyEncoder(BertPreTrainedModel):
         output = torch.matmul(attn_weights, v) # [bs, poly_m, dim]
         return output
 
-    def forward(self, context_input_ids, context_input_masks,
-                            responses_input_ids, responses_input_masks, labels=None):
+    def forward(self, context_input_ids=None, context_input_masks=None,
+                            responses_input_ids=None, responses_input_masks=None, labels=None):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
         if labels is not None:
@@ -106,10 +106,13 @@ class PolyEncoder(BertPreTrainedModel):
         embs = self.dot_attention(poly_codes, ctx_out, ctx_out) # [bs, poly_m, dim]
 
         # response encoder
-        responses_input_ids = responses_input_ids.view(-1, seq_length)
-        responses_input_masks = responses_input_masks.view(-1, seq_length)
-        cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
-        cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
+        if responses_input_ids is not None:
+            responses_input_ids = responses_input_ids.view(-1, seq_length)
+            responses_input_masks = responses_input_masks.view(-1, seq_length)
+            cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
+            cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
+            if context_input_ids is None:
+                return cand_emb
 
         # merge
         if labels is not None:
@@ -118,14 +121,8 @@ class PolyEncoder(BertPreTrainedModel):
             # so that every context is paired with batch_size responses
             cand_emb = cand_emb.permute(1, 0, 2) # [1, bs, dim]
             cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
-            ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
-            #dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
-            #C_negs = 1
-            #mask = (torch.eye(batch_size) + C_negs) - torch.eye(batch_size)*C_negs # [bs, bs]
-            #mask = mask.to(context_input_ids.device)
-            #loss = F.log_softmax(dot_product, dim=-1) * mask
-            #loss = (-loss.sum(dim=1)).mean() 
             
+            ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
             pt_candidates = cand_emb.squeeze(1)
             
             logits = (ctx_emb * pt_candidates).sum(-1)  # [bs, bs]
