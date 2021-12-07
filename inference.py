@@ -108,10 +108,30 @@ if __name__ == '__main__':
         elif args.architecture == 'poly':
             context_token_ids_list_batch, context_input_masks_list_batch = batch
             with open(args.out_base, 'r') as base:
+                embd_batch=[]
+                ids_batch=[]
+                relevant_response = None
+                relevant_sim = 0
                 for step, i in enumerate(base.readlines()):
                     ids, embd = i.split('|||')
                     ids = np.array([float(i) for i in ids.split(' ')])
                     embd = np.array([float(i) for i in embd.split(' ')])
+                    embd_batch.append(embd)
+                    ids_batch.append(ids)
+                    if step % batch_size == 0:
+                        print(i)
+                        embd_batch=[]
+                        out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch).cpu().detach().numpy()
+                        outmax = max(out)
+                        if outmax > relevant_sim:
+                            print('new', outmax)
+                            relevant_sim = outmax
+                            max_i = np.argmax(out)
+                            relevant_response = embd_batch[max_i]
+            responce = convert_ids_to_str(relevant_response, tokenizer, True)
+            print(responce, relevant_sim)
+            dialog_history.append(responce)
+                        
                     
         else:
             context_token_ids_list_batch, context_input_masks_list_batch = batch
