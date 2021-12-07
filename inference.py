@@ -120,7 +120,7 @@ if __name__ == '__main__':
                     ids_batch.append(ids)
                     if step % args.batch_size == 0:
                         embd_batch = torch.tensor(embd_batch).to(device)
-                        print(i)
+                        print(embd_batch)
                         embd_batch=[]
                         out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch).cpu().detach().numpy()
                         outmax = max(out)
