@@ -82,6 +82,9 @@ class PolyEncoder(BertPreTrainedModel):
         torch.nn.init.normal_(self.poly_code_embeddings.weight, config.hidden_size ** -0.5)
 
     def dot_attention(self, q, k, v):
+        print(q)
+        print(k)
+        print(v)
         # q: [bs, poly_m, dim] or [bs, res_cnt, dim]
         # k=v: [bs, length, dim] or [bs, poly_m, dim]
         attn_weights = torch.matmul(q, k.transpose(2, 1)) # [bs, poly_m, length]
