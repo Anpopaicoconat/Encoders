@@ -97,8 +97,11 @@ class PolyEncoder(BertPreTrainedModel):
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
         print(responses_input_ids)
-        batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
-
+        if mod != 'inference':
+            batch_size, res_cnt, seq_length = responses_input_ids.shape # res_cnt is 1 during training
+        else:
+            batch_size, seq_length = responses_input_ids.shape # res_cnt is 1 during training
+            res_cnt = 1
         # context encoder
         if context_input_ids is not None:
             ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
