@@ -119,9 +119,8 @@ if __name__ == '__main__':
                     embd_batch.append(embd)
                     ids_batch.append(ids)
                     if step % args.batch_size == 0:
-                        embd_batch = [torch.tensor(e).to(device) for e in embd_batch]
+                        embd_batch = torch.tensor(embd_batch).to(device)
                         print(embd_batch)
-                        embd_batch=[]
                         out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch, mod='inference').cpu().detach().numpy()
                         outmax = max(out)
                         if outmax > relevant_sim:
@@ -129,6 +128,7 @@ if __name__ == '__main__':
                             relevant_sim = outmax
                             max_i = np.argmax(out)
                             relevant_response = embd_batch[max_i]
+                        embd_batch=[]
             responce = convert_ids_to_str(relevant_response, tokenizer, True)
             print(responce, relevant_sim)
             dialog_history.append(responce)
