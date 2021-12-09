@@ -8,7 +8,7 @@ def get_dialog(inp, mod):
             out[-1] = out[-1] + ' ' + i
         else:
             out.append(i)
-    out = [i.replace('Пользователь: 1', '')..replace('Пользователь: 2', '') for i in out]
+    out = [i.replace('Пользователь: 1', '').replace('Пользователь: 2', '') for i in out]
     return out
 
 def proc_row(row, data, negs_n, out_file, mod):
