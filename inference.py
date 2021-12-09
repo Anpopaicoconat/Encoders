@@ -100,7 +100,7 @@ if __name__ == '__main__':
         dialog_history.append(inp_string)
         ########################
         context = context_transform(dialog_history)
-        context = tuple(torch.tensor([t]).to(device) for t in batch)
+        context = tuple(torch.tensor([t]).to(device) for t in context)
         relevant_response = None
         relevant_sim = 0
         
