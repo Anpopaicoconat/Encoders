@@ -58,8 +58,7 @@ if __name__ == '__main__':
     parser.add_argument("--max_contexts_length", default=128, type=int)
     parser.add_argument("--max_response_length", default=32, type=int)
     parser.add_argument("--batch_size", default=32, type=int, help="Total batch size for training.")
-    parser.add_argument("--train_dir", default='data/ubuntu_data', type=str)
-    parser.add_argument("--out_base", type=str, help="Path to computed cadidate base.")
+    parser.add_argument("--cand_base", type=str, help="Path to computed cadidate base.")
     args = parser.parse_args()
     print(args)
     
@@ -105,7 +104,7 @@ if __name__ == '__main__':
         relevant_sim = 0
         
         if args.architecture == 'poly':
-            if True:
+            if args.cand_base == 'no':
                 train_dataset = dataset.SelectionDataset(os.path.join(args.train_dir, 'train.txt'),
                                                                       context_transform, response_transform, concat_transform, sample_cnt=None, mode=args.architecture)
                 dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, collate_fn=train_dataset.batchify_join_str, shuffle=True, num_workers=0)
@@ -123,8 +122,8 @@ if __name__ == '__main__':
                         max_i = np.argmax(dot_prods)
                         relevant_response = response_token_ids_list_batch[max_i][0]
                     
-            elif False:
-                with open(args.out_base, 'r') as base:
+            else:
+                with open(args.cand_base, 'r') as base:
                     embd_batch=[]
                     ids_batch=[]
                     for step, i in enumerate(base.readlines()):
