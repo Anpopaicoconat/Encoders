@@ -99,35 +99,50 @@ if __name__ == '__main__':
         inp_string = input('user: ')
         dialog_history.append(inp_string)
         ########################
-        batch = context_transform(dialog_history)
-        batch = tuple(torch.tensor([t]).to(device) for t in batch)
-        if args.architecture == 'cross':
-            raise Exception('not implemented yet')
-            text_token_ids_list_batch, text_input_masks_list_batch = batch
-            loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
-            
-        elif args.architecture == 'poly':
-            context_token_ids_list_batch, context_input_masks_list_batch = batch
-            with open(args.out_base, 'r') as base:
-                embd_batch=[]
-                ids_batch=[]
-                relevant_response = None
-                relevant_sim = 0
-                for step, i in enumerate(base.readlines()):
-                    ids, embd = i.split('|||')
-                    ids = np.array([float(i) for i in ids.split(' ')])
-                    embd = np.array([float(i) for i in embd.split(' ')])
-                    embd_batch.append(embd)
-                    ids_batch.append(ids)
+        context = context_transform(dialog_history)
+        context = tuple(torch.tensor([t]).to(device) for t in batch)
+        relevant_response = None
+        relevant_sim = 0
+        
+        if args.architecture == 'poly':
+            if True:
+                train_dataset = SelectionDataset(os.path.join(args.train_dir, 'train.txt'),
+                                                                      context_transform, response_transform, concat_transform, sample_cnt=None, mode=args.architecture)
+                dataloader = DataLoader(train_dataset, batch_size=args.train_batch_size, collate_fn=train_dataset.batchify_join_str, shuffle=True, num_workers=0)
+                context_token_ids_list_batch, context_input_masks_list_batch = context
+                for step, batch in enumerate(dataloader):
+                    batch = tuple(t.to(device) for t in batch)
+                    _, _, response_token_ids_list_batch, response_input_masks_list_batch, _ = batch
+                    dot_prods = model(context_token_ids_list_batch, context_input_masks_list_batch, response_token_ids_list_batch, response_input_masks_list_batch)
                     if step % args.batch_size == 0 and step:
-                        embd_batch = torch.tensor([embd_batch], dtype=torch.float).to(device)
-                        out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch, mod='inference').cpu().detach().numpy()[0]# [n_cand: n_cand] поэтому берем 0
-                        outmax = max(out)
-                        if outmax > relevant_sim:
-                            relevant_sim = outmax
-                            max_i = np.argmax(out)
-                            relevant_response = ids_batch[max_i]
-                        embd_batch=[]
+                        print(dot_prods)
+                    dot_prods = dot_prods[0]
+                    outmax = max()
+                    if outmax > relevant_sim:
+                        relevant_sim = outmax
+                        max_i = np.argmax(dot_prods)
+                        relevant_response = ids_batch[max_i]
+                    
+            elif False:
+                with open(args.out_base, 'r') as base:
+                    embd_batch=[]
+                    ids_batch=[]
+                    for step, i in enumerate(base.readlines()):
+                        ids, embd = i.split('|||')
+                        ids = np.array([float(i) for i in ids.split(' ')])
+                        embd = np.array([float(i) for i in embd.split(' ')])
+                        embd_batch.append(embd)
+                        ids_batch.append(ids)
+                        if step % args.batch_size == 0 and step:
+                            embd_batch = torch.tensor([embd_batch], dtype=torch.float).to(device)
+                            out = model(context_token_ids_list_batch, context_input_masks_list_batch, embd_batch, mod='inference').cpu().detach().numpy()[0]# [n_cand: n_cand] поэтому берем 0
+                            outmax = max(out)
+                            if outmax > relevant_sim:
+                                relevant_sim = outmax
+                                max_i = np.argmax(out)
+                                relevant_response = ids_batch[max_i]
+                            embd_batch=[]
+                            ids_batch=[]
             responce = convert_ids_to_str(relevant_response, tokenizer, True)
             print(responce, relevant_sim)
             dialog_history.append(responce)
