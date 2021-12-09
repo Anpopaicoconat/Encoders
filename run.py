@@ -184,7 +184,7 @@ if __name__ == '__main__':
     log_wf = open(os.path.join(args.output_dir, 'log.txt'), 'a', encoding='utf-8')
     print (args, file=log_wf)
 
-    state_save_path = os.path.join(args.output_dir, '{}_{}_pytorch_model.bin'.format(args.architecture, args.poly_m))
+    state_save_path = os.path.join(args.output_dir, 'pytorch_model.bin'.format(args.architecture, args.poly_m))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ########################################
