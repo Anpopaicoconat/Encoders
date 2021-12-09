@@ -93,7 +93,7 @@ class PolyEncoder(BertPreTrainedModel):
                             responses_input_ids=None, responses_input_masks=None, labels=None, mod='train'):
         # during training, only select the first response
         # we are using other instances in a batch as negative examples
-        if labels is not None or mod == 'get_base':
+        if labels is not None or mod == 'get_base' or mod == 'inference2':
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
 
@@ -102,6 +102,8 @@ class PolyEncoder(BertPreTrainedModel):
 
         # context encoder
         if context_input_ids is not None:
+            if mod == 'inference2': #подаем батч с предложением пользователя и расширяем до размера батча-числа кандидатов
+                context_input_ids = context_input_ids.expand(batch_size, batch_size, seq_length)
             ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
             poly_code_ids = torch.arange(self.poly_m, dtype=torch.long).to(context_input_ids.device)
             poly_code_ids = poly_code_ids.unsqueeze(0).expand(batch_size, self.poly_m)
@@ -128,6 +130,8 @@ class PolyEncoder(BertPreTrainedModel):
             cand_emb = cand_emb.expand(batch_size, batch_size, cand_emb.shape[2]) # [bs, bs, dim]
             ctx_emb = self.dot_attention(cand_emb, embs, embs).squeeze() # [bs, bs, dim]
             dot_product = (ctx_emb*cand_emb).sum(-1) # [bs, bs]
+            if mod == 'inference2':
+                return dot_product
             mask = torch.eye(batch_size).to(context_input_ids.device) # [bs, bs]
             loss = F.log_softmax(dot_product, dim=-1) * mask
             loss = (-loss.sum(dim=1)).mean()
