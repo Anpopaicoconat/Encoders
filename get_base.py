@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument("--max_contexts_length", default=128, type=int)
     parser.add_argument("--max_response_length", default=32, type=int)
     parser.add_argument("--batch_size", default=32, type=int, help="Total batch size for training.")
-    parser.add_argument("--train_dir", default='data/ubuntu_data', type=str)
+    parser.add_argument("--train_dir", default='', type=str)
     parser.add_argument("--out_base", type=str, help="Path to computed cadidate base.")
     args = parser.parse_args()
     print(args)
@@ -44,8 +44,7 @@ if __name__ == '__main__':
     response_transform = transform.SelectionSequentialTransform(tokenizer=tokenizer, max_len=args.max_response_length)
     concat_transform = transform.SelectionConcatTransform(tokenizer=tokenizer, max_len=args.max_response_length+args.max_contexts_length)
     
-    train_dataset = dataset.SelectionDataset(os.path.join(args.train_dir, 'train.txt'),
-                                                                  context_transform, response_transform, concat_transform, sample_cnt=None, mode=args.architecture)
+    train_dataset = dataset.SelectionDataset(args.train_dir, context_transform, response_transform, concat_transform, sample_cnt=None, mode=args.architecture)
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, collate_fn=train_dataset.batchify_join_str, shuffle=True, num_workers=0)
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
