@@ -68,6 +68,8 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
     
+    index = faiss.index_factory(512, “,IVF65536, Flat”, faiss.METRIC_L2)
+    
     with open(args.out_base, 'w') as base:
         L = len(train_dataloader)
         for step, batch in enumerate(train_dataloader):
