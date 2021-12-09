@@ -111,6 +111,8 @@ if __name__ == '__main__':
                 dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, collate_fn=train_dataset.batchify_join_str, shuffle=True, num_workers=0)
                 context_token_ids_list_batch, context_input_masks_list_batch = context
                 for step, batch in enumerate(dataloader):
+                    if step%100 == 0:
+                        print(step)
                     batch = tuple(t.to(device) for t in batch)
                     _, _, response_token_ids_list_batch, response_input_masks_list_batch, _ = batch
                     dot_prods = model(context_token_ids_list_batch, context_input_masks_list_batch, response_token_ids_list_batch, response_input_masks_list_batch, mod='inference2')
