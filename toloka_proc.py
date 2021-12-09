@@ -33,9 +33,13 @@ def proc_row(row, data, negs_n, out_file, mod):
 
 def get_datasets(df, split_i, negs_n, mod, train_path='train.txt', val_path='dev.txt'):
     data = df.sample(len(df))
-    split_i = len(data)//split_i
-    train = data[split_i:]
-    val = data[:split_i]
+    if split_i != 0:
+        split_i = len(data)//split_i
+        train = data[split_i:]
+        val = data[:split_i]
+    else:
+        train = data
+        val = data[:1]
     with open(train_path, 'w') as f:
         pass
     with open(val_path, 'w') as f:
