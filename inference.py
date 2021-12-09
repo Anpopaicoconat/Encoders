@@ -112,7 +112,7 @@ if __name__ == '__main__':
                 context_token_ids_list_batch, context_input_masks_list_batch = context
                 for step, batch in enumerate(dataloader):
                     if step%100 == 0:
-                        print(step)
+                        print(step, '<', len(dataloader))
                     batch = tuple(t.to(device) for t in batch)
                     _, _, response_token_ids_list_batch, response_input_masks_list_batch, _ = batch
                     dot_prods = model(context_token_ids_list_batch, context_input_masks_list_batch, response_token_ids_list_batch, response_input_masks_list_batch, mod='inference2')
