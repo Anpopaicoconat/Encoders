@@ -59,6 +59,7 @@ parser.add_argument("--mod", default='join', type=str)
 parser.add_argument("--path", default='toloka', type=str)
 parser.add_argument("--negs", default=15, type=int)
 parser.add_argument("--split", default=3, type=int)
+args = parser.parse_args()
     
 df = pd.read_csv('TlkPersonaChatRus/dialogues.tsv', delimiter='\t')
-get_datasets(df, parser.split, parser.negs,  train_path='{}/train.txt'.format(parser.path), val_path='{}/dev.txt'.format(parser.path), mod=parser.mod)
+get_datasets(df, args.split, args.negs,  train_path='{}/train.txt'.format(args.path), val_path='{}/dev.txt'.format(args.path), mod=args.mod)
