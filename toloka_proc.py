@@ -52,7 +52,7 @@ def get_datasets(df, split_i, negs_n, mod, train_path='train.txt', val_path='dev
         proc_row(row,train, negs_n, train_path, mod=mod)
     print(len(train))
     for row in val.iterrows():
-        proc_row(row,train, negs_n, val_path)
+        proc_row(row,train, negs_n, val_path, mod=mod)
     print(len(val))
     
 parser = argparse.ArgumentParser()
