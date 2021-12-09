@@ -18,7 +18,7 @@ class BiEncoder(BertPreTrainedModel):
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
 
         context_vec = self.bert(context_input_ids, context_input_masks)[0][:,0,:]  # [bs,dim]
-        if responses_input_ids is None:
+        if responses_input_ids is None: 
             return context_vec
         else:
             batch_size, res_cnt, seq_length = responses_input_ids.shape
@@ -103,7 +103,7 @@ class PolyEncoder(BertPreTrainedModel):
         # context encoder
         if context_input_ids is not None:
             if mod == 'inference2': #подаем батч с предложением пользователя и расширяем до размера батча-числа кандидатов
-                context_input_ids = context_input_ids.expand(batch_size, batch_size, context_input_ids.shape[-1])
+                context_input_ids = context_input_ids.expand(batch_size, context_input_ids.shape[-1])
                 context_input_masks = context_input_masks.expand(batch_size, batch_size, context_input_masks.shape[-1])
             ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
             poly_code_ids = torch.arange(self.poly_m, dtype=torch.long).to(context_input_ids.device)
