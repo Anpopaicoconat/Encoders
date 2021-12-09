@@ -140,7 +140,7 @@ if __name__ == '__main__':
                             embd_batch=[]
                             ids_batch=[]
             responce = convert_ids_to_str(relevant_response, tokenizer, True)
-            print(responce, relevant_sim)
+            print(responce, relevant_sim, convert_ids_to_str(context_token_ids_list_batch[0], tokenizer, True))
             dialog_history.append(responce)
                         
                     
