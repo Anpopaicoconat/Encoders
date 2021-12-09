@@ -103,7 +103,8 @@ class PolyEncoder(BertPreTrainedModel):
         # context encoder
         if context_input_ids is not None:
             if mod == 'inference2': #подаем батч с предложением пользователя и расширяем до размера батча-числа кандидатов
-                context_input_ids = context_input_ids.expand(batch_size, batch_size, seq_length)
+                context_input_ids = context_input_ids.expand(batch_size, batch_size, context_input_ids.shape[2])
+                context_input_masks = context_input_masks.expand(batch_size, batch_size, context_input_masks.shape[2])
             ctx_out = self.bert(context_input_ids, context_input_masks)[0]  # [bs, length, dim]
             poly_code_ids = torch.arange(self.poly_m, dtype=torch.long).to(context_input_ids.device)
             poly_code_ids = poly_code_ids.unsqueeze(0).expand(batch_size, self.poly_m)
