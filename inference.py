@@ -121,7 +121,7 @@ if __name__ == '__main__':
                     if outmax > relevant_sim:
                         relevant_sim = outmax
                         max_i = np.argmax(dot_prods)
-                        relevant_response = ids_batch[max_i]
+                        relevant_response = response_token_ids_list_batch[max_i]
                     
             elif False:
                 with open(args.out_base, 'r') as base:
