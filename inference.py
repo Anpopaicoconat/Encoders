@@ -96,6 +96,7 @@ if __name__ == '__main__':
         ########################
         context = context_transform(dialog_history)
         context = tuple(torch.tensor([t]).to(device) for t in context)
+        context_token_ids_list_batch, context_input_masks_list_batch = context
         relevant_response = None
         relevant_sim = 0
         
@@ -105,7 +106,6 @@ if __name__ == '__main__':
                 train_dataset = dataset.SelectionDataset(os.path.join(args.train_dir, 'train.txt'),
                                                                       context_transform, response_transform, concat_transform, sample_cnt=None, mode=args.architecture)
                 dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, collate_fn=train_dataset.batchify_join_str, shuffle=True, num_workers=0)
-                context_token_ids_list_batch, context_input_masks_list_batch = context
                 for step, batch in enumerate(dataloader):
                     if step%100 == 0:
                         print(step, '<', len(dataloader))
