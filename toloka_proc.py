@@ -1,3 +1,6 @@
+import argparse
+import pandas as pd
+
 def get_dialog(inp, mod):
     inp = inp['dialogue'].replace('<span class=participant_2>', '').replace('<span class=participant_1>', '').replace('</span>', '').replace('\r', '').replace('\n', '').split('<br />')
     out = [inp[0]]
