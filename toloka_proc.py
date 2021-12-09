@@ -50,5 +50,5 @@ def get_datasets(df, split_i, negs_n, mod, train_path='train.txt', val_path='dev
 parser = argparse.ArgumentParser()
 parser.add_argument("--mod", default='join', type=str)
     
-df = pd.read_csv('/content/TlkPersonaChatRus/dialogues.tsv', delimiter='\t')
+df = pd.read_csv('TlkPersonaChatRus/dialogues.tsv', delimiter='\t')
 get_datasets(df, 3, 15,  train_path='toloka/train.txt', val_path='toloka/dev.txt', mod=parser.mod)
