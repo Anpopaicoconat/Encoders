@@ -115,10 +115,10 @@ if __name__ == '__main__':
                     batch = tuple(t.to(device) for t in batch)
                     _, _, response_token_ids_list_batch, response_input_masks_list_batch, _ = batch
                     dot_prods = model(context_token_ids_list_batch, context_input_masks_list_batch, response_token_ids_list_batch, response_input_masks_list_batch)
-                    if step % args.batch_size == 0 and step:
+                    if step % args.batch_size == 0:
                         print(dot_prods)
                     dot_prods = dot_prods[0]
-                    outmax = max()
+                    outmax = max(dot_prods)
                     if outmax > relevant_sim:
                         relevant_sim = outmax
                         max_i = np.argmax(dot_prods)
