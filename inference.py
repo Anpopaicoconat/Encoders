@@ -116,7 +116,7 @@ if __name__ == '__main__':
                     dot_prods = model(context_token_ids_list_batch, context_input_masks_list_batch, response_token_ids_list_batch, response_input_masks_list_batch, mod='inference2')
                     if step % args.batch_size == 0:
                         print(dot_prods)
-                    dot_prods = dot_prods[0]
+                    dot_prods = dot_prods[0].cpu().detach().numpy()
                     outmax = max(dot_prods)
                     if outmax > relevant_sim:
                         relevant_sim = outmax
