@@ -122,7 +122,7 @@ class PolyEncoder(BertPreTrainedModel):
             cand_emb = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
 
         # merge
-        if labels is not None:
+        if labels is not None or mod == 'inference2':
             # we are recycling responses for faster training
             # we repeat responses for batch_size times to simulate test phase
             # so that every context is paired with batch_size responses
