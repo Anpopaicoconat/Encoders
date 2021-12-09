@@ -35,13 +35,17 @@ def proc_row(row, data, negs_n, out_file, mod):
         
     
 
-def get_datasets(df, split_i, negs_n, mod, train_path='train.txt', val_path='dev.txt'):
+def get_datasets(df, split_i, negs_n, mod, path='train.txt'):
     data = df.sample(len(df))
     if split_i != 0:
+        train_path='{}/train.txt'.format(path)
+        val_path='{}/dev.txt'.format(path)
         split_i = len(data)//split_i
         train = data[split_i:]
         val = data[:split_i]
     else:
+        train_path='{}/split.txt'.format(path)
+        val_path='{}/val.txt'.format(path)
         train = data
         val = data[:1]
     with open(train_path, 'w') as f:
@@ -63,4 +67,4 @@ parser.add_argument("--split", default=3, type=int)
 args = parser.parse_args()
     
 df = pd.read_csv('TlkPersonaChatRus/dialogues.tsv', delimiter='\t')
-get_datasets(df, args.split, args.negs,  train_path='{}/train.txt'.format(args.path), val_path='{}/dev.txt'.format(args.path), mod=args.mod)
+get_datasets(df, args.split, args.negs, path=args.path, mod=args.mod)
