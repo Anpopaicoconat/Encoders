@@ -93,8 +93,8 @@ if __name__ == '__main__':
 
         elif args.architecture == 'bi':
             candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
-            out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch, mod='get_base').cpu().detach().tonumpy()
-            context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tonumpy()
+            out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch, mod='get_base').cpu().detach().numpy()
+            context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().numpy()
             
             if args.faiss:
                 #index.add_with_ids(out, context_token_ids_list_batch)
