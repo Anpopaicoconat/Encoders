@@ -158,7 +158,7 @@ if __name__ == '__main__':
                 relevant_sim, I = index.search(out, 1)[0]
                 relevant_response = df_base.loc[I]
             else:
-                with open(args.out_base, 'r') as base
+                with open(args.out_base, 'r') as base:
                     for step, i in enumerate(base.readlines()):
                         ids, embd = i.split('|||')
                         ids = np.array([float(i) for i in ids.split(' ')])
