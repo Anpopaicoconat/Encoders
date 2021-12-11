@@ -73,7 +73,7 @@ if __name__ == '__main__':
     if args.faiss:
         print(bert_config.pooler_fc_size)
         index = faiss.index_factory(bert_config.pooler_fc_size, ',IVF1080, Flat', faiss.METRIC_L2)
-        list_for_faiss = []
+        list_for_faiss = None
     else:
         base = open(args.out_base, 'w')
         
@@ -98,7 +98,7 @@ if __name__ == '__main__':
             
             if args.faiss:
                 #index.add_with_ids(out, context_token_ids_list_batch)
-                if list_for_faiss:
+                if list_for_faiss is not None:
                     list_for_faiss = np.concatinate((list_for_faiss, out), axis=0)
                 else:
                     list_for_faiss = out
