@@ -73,7 +73,7 @@ if __name__ == '__main__':
         print(bert_config.pooler_fc_size)
         index = faiss.index_factory(bert_config.pooler_fc_size, ',IVF1080, Flat', faiss.METRIC_L2)
         list_for_fais = []
-   else:
+    else:
         base = open(args.out_base, 'w')
         
     L = len(train_dataloader)
