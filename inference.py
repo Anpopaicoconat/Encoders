@@ -4,6 +4,7 @@ import pandas as pd
 import argparse
 import os
 import numpy as np
+import faiss
 
 import dataset
 import transform 
