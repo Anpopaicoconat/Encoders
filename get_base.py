@@ -123,7 +123,7 @@ if __name__ == '__main__':
         print(index.ntotal)
         faiss.write_index(index, "flat.index")
         print('saved')
-        pd.DataFrame(list_for_faiss_ids).to_csv('flat.csv')
+        pd.DataFrame(list_for_faiss_ids).to_csv('flat.csv', index=False)
     else: 
         base.close()
     
