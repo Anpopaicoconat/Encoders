@@ -88,6 +88,9 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
     ########################
+    if :
+        df_base = pd.read_csv('flat.csv')
+        index = faiss.read_index(args.cand_base)
     dialog_history = []
     inp_string = None
     while inp_string != 'user: !end':
@@ -144,25 +147,29 @@ if __name__ == '__main__':
             dialog_history.append(responce)
                         
                     
-        else:
+        elif args.architecture == 'bi':
             context_token_ids_list_batch, context_input_masks_list_batch = batch
             out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
             print(out.shape)
             relevant_response = [None]
             relevant_sim = [0]
-            with open(args.out_base, 'r') as base:
-
-                for step, i in enumerate(base.readlines()):
-                    ids, embd = i.split('|||')
-                    ids = np.array([float(i) for i in ids.split(' ')])
-                    embd = np.array([float(i) for i in embd.split(' ')])
-                    cos_sim = np.matmul(out, embd)
-                    if cos_sim > relevant_sim[-1]:
-                        relevant_sim.append(cos_sim)
-                        relevant_response.append(ids)
-                    if len(relevant_response)>10:
-                        relevant_response = relevant_response[1:]
-                        relevant_sim = relevant_sim[1:]
+            if args.cand_base[-6:] == '.index':
+                relevant_sim, I = index.search(out, 1)[0]
+                relevant_response = df_base.loc[I]
+            else:
+                with open(args.out_base, 'r') as base
+                    for step, i in enumerate(base.readlines()):
+                        ids, embd = i.split('|||')
+                        ids = np.array([float(i) for i in ids.split(' ')])
+                        embd = np.array([float(i) for i in embd.split(' ')])
+                        cos_sim = np.matmul(out, embd)
+                        if cos_sim > relevant_sim[-1]:
+                            relevant_sim.append(cos_sim)
+                            relevant_response.append(ids)
+                        if len(relevant_response)>10:
+                            relevant_response = relevant_response[1:]
+                            relevant_sim = relevant_sim[1:]
+                            
             responce = convert_ids_to_str(relevant_response[-1], tokenizer, True)
             print(responce)
             dialog_history.append(responce)
