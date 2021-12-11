@@ -114,7 +114,7 @@ if __name__ == '__main__':
             raise Exception('not implemented yet for this architecture')
 
         if step%10==0:
-            print(step, L, list_for_faiss.shape)
+            print(step, L, list_for_faiss.shape, list_for_faiss_ids.shape)
     if args.faiss:
         print()
         index.train(list_for_faiss)
