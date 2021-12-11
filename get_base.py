@@ -72,8 +72,9 @@ if __name__ == '__main__':
     
     if args.faiss:
         print(bert_config.pooler_fc_size)
-        index = faiss.index_factory(bert_config.pooler_fc_size, ',IVF1080, Flat', faiss.METRIC_L2)
+        index = faiss.index_factory(bert_config.pooler_fc_size, ',IVF512, Flat', faiss.METRIC_L2)
         list_for_faiss = None
+        list_for_faiss_ids = None
     else:
         base = open(args.out_base, 'w')
         
@@ -100,8 +101,10 @@ if __name__ == '__main__':
                 #index.add_with_ids(out, context_token_ids_list_batch)
                 if list_for_faiss is not None:
                     list_for_faiss = np.concatenate((list_for_faiss, out), axis=0)
+                    list_for_faiss_ids = np.concatenate((list_for_faiss_ids, candidates_token_ids_list_batch), axis=0)
                 else:
                     list_for_faiss = out
+                    list_for_faiss_ids = candidates_token_ids_list_batch
             else:
                 for ids, embd in zip(candidates_token_ids_list_batch, out):
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
@@ -116,7 +119,7 @@ if __name__ == '__main__':
         print()
         index.train(list_for_faiss)
         print(index.is_trained)
-        index.add(list_for_faiss)
+        index..add_with_ids(list_for_faiss, list_for_faiss_ids)
         print(index.ntotal)
         faiss.write_index(index, "flat.index")
         print('saved')
