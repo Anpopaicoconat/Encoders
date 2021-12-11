@@ -88,7 +88,8 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
     ########################
-    if :
+    if args.cand_base[-6:] == '.index':
+        print('use faiss')
         df_base = pd.read_csv('flat.csv')
         index = faiss.read_index(args.cand_base)
     dialog_history = []
