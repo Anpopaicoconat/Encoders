@@ -150,7 +150,6 @@ if __name__ == '__main__':
                         
                     
         elif args.architecture == 'bi':
-            context_token_ids_list_batch, context_input_masks_list_batch = batch
             out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().numpy()
             print(out.shape)
             relevant_response = [None]
