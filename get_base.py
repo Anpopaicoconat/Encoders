@@ -119,7 +119,7 @@ if __name__ == '__main__':
         print()
         index.train(list_for_faiss)
         print(index.is_trained)
-        index..add_with_ids(list_for_faiss, list_for_faiss_ids)
+        index.add_with_ids(list_for_faiss, list_for_faiss_ids)
         print(index.ntotal)
         faiss.write_index(index, "flat.index")
         print('saved')
