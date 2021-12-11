@@ -72,7 +72,7 @@ if __name__ == '__main__':
     
     if args.faiss:
         print(bert_config.pooler_fc_size)
-        index = faiss.index_factory(bert_config.pooler_fc_size, ',IVF512, Flat', faiss.METRIC_L2)
+        index = faiss.index_factory(bert_config.pooler_fc_size, ',IVF1000, Flat', faiss.METRIC_L2)
         list_for_faiss = None
         list_for_faiss_ids = None
     else:
