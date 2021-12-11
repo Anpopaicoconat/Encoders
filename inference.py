@@ -155,7 +155,7 @@ if __name__ == '__main__':
             relevant_response = [None]
             relevant_sim = [0]
             if args.cand_base[-6:] == '.index':
-                relevant_sim, I = index.search(np.expanddim(out, axis=0), 5)
+                relevant_sim, I = index.search(np.expand_dims(out, axis=0), 5)
                 print(relevant_sim, I)
                 relevant_response = df_base.loc[I]
             else:
