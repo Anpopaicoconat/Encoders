@@ -92,10 +92,14 @@ if __name__ == '__main__':
 
         elif args.architecture == 'bi':
             context_token_ids_list_batch, context_input_masks_list_batch = batch
-            out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().tolist()
-            context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tolist()
+            out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().tonumpy()
+            context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tonumpy()
             if args.faiss:
-                index.add_with_ids(out, context_token_ids_list_batch)
+                #index.add_with_ids(out, context_token_ids_list_batch)
+                if list_for_faiss:
+                    list_for_faiss = np.concatinate((list_for_faiss, out), axis=0)
+                else:
+                    list_for_faiss = out
             else:
                 for ids, embd in zip(context_token_ids_list_batch, out):
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
@@ -106,9 +110,12 @@ if __name__ == '__main__':
 
         if step%10==0:
             print(step, L)
-                
-    if not args.faiss:
+    if args.faiss:
+        print()
+        index.train(list_for_faiss)
+        index.add(list_for_faiss)
+        faiss.write_index(index, "flat.index")
+    else: 
         base.close()
-        
     
     
