@@ -19,12 +19,14 @@ class BiEncoder(BertPreTrainedModel):
         #context
         if context_input_ids is not None:
             context_vec = self.bert(context_input_ids, context_input_masks)[0][:,0,:]  # [bs,dim]
+            if mod == 'inference':
+                return context_vec
         
         #candidats
         batch_size, res_cnt, seq_length = responses_input_ids.shape
         responses_input_ids = responses_input_ids.view(-1, seq_length)
         responses_input_masks = responses_input_masks.view(-1, seq_length)
-        if mod == 'inference':
+        if mod == 'inference2':
             cand_emb = responses_input_ids
         else:
             responses_input_ids = responses_input_ids.view(-1, seq_length)
