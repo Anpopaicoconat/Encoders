@@ -5,6 +5,7 @@ import argparse
 import os
 import csv
 import numpy as np
+import faiss
 
 import dataset
 import transform 
@@ -35,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", default=32, type=int, help="Total batch size for training.")
     parser.add_argument("--train_dir", default='', type=str)
     parser.add_argument("--out_base", type=str, help="Path to computed cadidate base.")
+    parser.add_argument("--faiss", type=bool, help="Use faiss")
     args = parser.parse_args()
     print(args)
     
@@ -67,35 +69,46 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
     
-    #index = faiss.index_factory(512, ',IVF65536, Flat', faiss.METRIC_L2)
-    
-    with open(args.out_base, 'w') as base:
-        L = len(train_dataloader)
-        for step, batch in enumerate(train_dataloader):
-            batch = tuple(t.to(device) for t in batch[2:4])
-            if args.architecture == 'cross':
-                text_token_ids_list_batch, text_input_masks_list_batch = batch
-                loss = model(text_token_ids_list_batch, text_input_masks_list_batch)
-                
-            elif args.architecture == 'poly':
-                candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
-                out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch, mod='get_base').cpu().detach().tolist()
-                
-                candidates_token_ids_list_batch = candidates_token_ids_list_batch.cpu().detach().tolist()
-                for ids, embd in zip(candidates_token_ids_list_batch, out):
-                    ids=ids[0]
-                    string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
-                    base.write(string)
-                    
+    if args.faiss:
+        print(bert_config.pooler_fc_size)
+        index = faiss.index_factory(bert_config.pooler_fc_size, ',IVF1080, Flat', faiss.METRIC_L2)
+        list_for_fais = []
+   else:
+        base = open(args.out_base, 'w')
+        
+    L = len(train_dataloader)
+    for step, batch in enumerate(train_dataloader):
+        batch = tuple(t.to(device) for t in batch[2:4])
+
+        if args.architecture == 'poly':
+            candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
+            out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch, mod='get_base').cpu().detach().tolist()
+
+            candidates_token_ids_list_batch = candidates_token_ids_list_batch.cpu().detach().tolist()
+            for ids, embd in zip(candidates_token_ids_list_batch, out):
+                ids=ids[0]
+                string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
+                base.write(string)
+
+        elif args.architecture == 'bi':
+            context_token_ids_list_batch, context_input_masks_list_batch = batch
+            out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().tolist()
+            context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tolist()
+            if args.faiss:
+                index.add_with_ids(out, context_token_ids_list_batch)
             else:
-                context_token_ids_list_batch, context_input_masks_list_batch = batch
-                out = model(context_token_ids_list_batch, context_input_masks_list_batch).cpu().detach().tolist()
-                context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tolist()
                 for ids, embd in zip(context_token_ids_list_batch, out):
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
-    
                     base.write(string)
-            if step%10==0:
-                print(step, L)
+
+        else:
+            raise Exception('not implemented yet for this architecture')
+
+        if step%10==0:
+            print(step, L)
+                
+    if not args.faiss:
+        base.close()
+        
     
     
