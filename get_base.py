@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 base.write(string)
 
         elif args.architecture == 'bi':
-            context_token_ids_list_batch, context_input_masks_list_batch = batch
+            candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
             out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch, mod='get_base').cpu().detach().tonumpy()
             context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().tonumpy()
             
