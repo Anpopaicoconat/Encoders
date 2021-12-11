@@ -101,10 +101,10 @@ if __name__ == '__main__':
                 #index.add_with_ids(out, context_token_ids_list_batch)
                 if list_for_faiss is not None:
                     list_for_faiss = np.concatenate((list_for_faiss, out), axis=0)
-                    list_for_faiss_ids = np.concatenate((list_for_faiss_ids, candidates_token_ids_list_batch), axis=0)
+                    list_for_faiss_ids = np.concatenate((list_for_faiss_ids, candidates_token_ids_list_batch[:,0,:]), axis=0)
                 else:
                     list_for_faiss = out
-                    list_for_faiss_ids = candidates_token_ids_list_batch
+                    list_for_faiss_ids = candidates_token_ids_list_batch[:,0,:]
             else:
                 for ids, embd in zip(candidates_token_ids_list_batch, out):
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
