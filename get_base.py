@@ -99,7 +99,7 @@ if __name__ == '__main__':
             if args.faiss:
                 #index.add_with_ids(out, context_token_ids_list_batch)
                 if list_for_faiss is not None:
-                    list_for_faiss = np.concatinate((list_for_faiss, out), axis=0)
+                    list_for_faiss = np.concatenate((list_for_faiss, out), axis=0)
                 else:
                     list_for_faiss = out
             else:
