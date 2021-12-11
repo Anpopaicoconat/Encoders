@@ -94,7 +94,7 @@ if __name__ == '__main__':
         elif args.architecture == 'bi':
             candidates_token_ids_list_batch, candidates_input_masks_list_batch = batch
             out = model(responses_input_ids=candidates_token_ids_list_batch, responses_input_masks=candidates_input_masks_list_batch, mod='get_base').cpu().detach().numpy()
-            context_token_ids_list_batch = context_token_ids_list_batch.cpu().detach().numpy()
+            candidates_token_ids_list_batch = candidates_token_ids_list_batch.cpu().detach().numpy()
             
             if args.faiss:
                 #index.add_with_ids(out, context_token_ids_list_batch)
@@ -103,7 +103,7 @@ if __name__ == '__main__':
                 else:
                     list_for_faiss = out
             else:
-                for ids, embd in zip(context_token_ids_list_batch, out):
+                for ids, embd in zip(candidates_token_ids_list_batch, out):
                     string = '{}|||{}\n'.format(' '.join([str(i) for i in ids]), ' '.join([str(i) for i in embd]))
                     base.write(string)
 
