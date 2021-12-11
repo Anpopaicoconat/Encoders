@@ -111,12 +111,15 @@ if __name__ == '__main__':
             raise Exception('not implemented yet for this architecture')
 
         if step%10==0:
-            print(step, L)
+            print(step, L, list_for_faiss.shape)
     if args.faiss:
         print()
         index.train(list_for_faiss)
+        print(index.is_trained)
         index.add(list_for_faiss)
+        print(index.ntotal)
         faiss.write_index(index, "flat.index")
+        print('saved')
     else: 
         base.close()
     
