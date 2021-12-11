@@ -16,16 +16,22 @@ class BiEncoder(BertPreTrainedModel):
         if labels is not None or mod=='get_base':
             responses_input_ids = responses_input_ids[:, 0, :].unsqueeze(1)
             responses_input_masks = responses_input_masks[:, 0, :].unsqueeze(1)
-
+        #context
         context_vec = self.bert(context_input_ids, context_input_masks)[0][:,0,:]  # [bs,dim]
         
-
+        #candidats
         batch_size, res_cnt, seq_length = responses_input_ids.shape
         responses_input_ids = responses_input_ids.view(-1, seq_length)
         responses_input_masks = responses_input_masks.view(-1, seq_length)
-
-        responses_vec = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:]  # [bs,dim]
-        responses_vec = responses_vec.view(batch_size, res_cnt, -1)
+        if mod == 'inference':
+            cand_emb = responses_input_ids
+        else:
+            responses_input_ids = responses_input_ids.view(-1, seq_length)
+            responses_input_masks = responses_input_masks.view(-1, seq_length)
+            cand_emb = self.bert(responses_input_ids, responses_input_masks)[0][:,0,:] # [bs, dim]
+            if mod == 'get_base':
+                return cand_emb
+            responses_vec = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
 
         if labels is not None:
             pt_candidates = responses_vec.squeeze(1)
