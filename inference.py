@@ -156,6 +156,7 @@ if __name__ == '__main__':
             relevant_sim = [0]
             if args.cand_base[-6:] == '.index':
                 relevant_sim, I = index.search(out, 1)
+                print(relevant_sim, I)
                 relevant_response = df_base.loc[I]
             else:
                 with open(args.out_base, 'r') as base:
