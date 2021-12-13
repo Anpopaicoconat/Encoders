@@ -60,6 +60,7 @@ if __name__ == '__main__':
     parser.add_argument("--max_response_length", default=32, type=int)
     parser.add_argument("--batch_size", default=32, type=int, help="Total batch size for training.")
     parser.add_argument("--cand_base", type=str, help="Path to computed cadidate base.")
+    parser.add_argument("--train_dir", type=str, help="")
     args = parser.parse_args()
     print(args)
     
