@@ -172,6 +172,7 @@ if __name__ == '__main__':
                         if len(relevant_response)>10:
                             relevant_response = relevant_response[1:]
                             relevant_sim = relevant_sim[1:]
+            relevant_response = relevant_response[-1]
                             
             responce = convert_ids_to_str(relevant_response, tokenizer, True) #[-1]
             print(responce)
