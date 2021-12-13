@@ -160,7 +160,7 @@ if __name__ == '__main__':
                 print(relevant_sim, I)
                 relevant_response = df_base.loc[I]
             else:
-                with open(args.out_base, 'r') as base:
+                with open(args.cand_base, 'r') as base:
                     for step, i in enumerate(base.readlines()):
                         ids, embd = i.split('|||')
                         ids = np.array([float(i) for i in ids.split(' ')])
