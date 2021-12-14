@@ -151,7 +151,7 @@ if __name__ == '__main__':
     tokenizer = TokenizerClass.from_pretrained(os.path.join(args.bert_model, "vocab.txt"), do_lower_case=True, clean_text=False)
     context_transform = SelectionJoinTransform(tokenizer=tokenizer, max_len=args.max_contexts_length)
     response_transform = SelectionSequentialTransform(tokenizer=tokenizer, max_len=args.max_response_length)
-    concat_transform = SelectionConcatTransform(tokenizer=tokenizer, max_len=args.max_response_length+args.max_contexts_length)
+    #concat_transform = SelectionConcatTransform(tokenizer=tokenizer, max_len=args.max_response_length+args.max_contexts_length)
 
     print('=' * 80)
     print('Train dir:', args.train_dir)
