@@ -1,3 +1,7 @@
+import argparse
+import pandas as pd
+import numpy as np
+
 def get_dialog(inp, mod):
     p1 = inp['persona_1_profile'].replace('<span class=participant_2>', '').replace('<span class=participant_1>', '').replace('</span>', '').replace('\r', '').replace('\n', '').split('<br />')[:-1]
     p2 = inp['persona_2_profile'].replace('<span class=participant_2>', '').replace('<span class=participant_1>', '').replace('</span>', '').replace('\r', '').replace('\n', '').split('<br />')[:-1]
@@ -68,3 +72,13 @@ def get_datasets(df, split_i, negs_n, mod, path='train.txt'):
     for row in val.iterrows():
         proc_row(row,train, negs_n, val_path, mod=mod)
     print(len(val))
+    
+parser = argparse.ArgumentParser()
+parser.add_argument("--mod", default='join', type=str)
+parser.add_argument("--path", default='toloka', type=str)
+parser.add_argument("--negs", default=15, type=int)
+parser.add_argument("--split", default=3, type=int)
+args = parser.parse_args()
+    
+df = pd.read_csv('TlkPersonaChatRus/dialogues.tsv', delimiter='\t')
+get_datasets(df, args.split, args.negs, path=args.path, mod=args.mod)
