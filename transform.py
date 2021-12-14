@@ -32,7 +32,7 @@ class SelectionJoinTransform(object):
         # https://github.com/facebookresearch/ParlAI/issues/2306#issuecomment-599180186
         context = '\n'.join(texts[:-5])
         persona = '\n'.join(texts[-5:])
-        context = '[P]'.join(context, persona)
+        context = '[P]'.join([context, persona])
         tokenized_dict = self.tokenizer.encode_plus(context)
         input_ids, input_masks = tokenized_dict['input_ids'], tokenized_dict['attention_mask']
         input_ids = input_ids[-self.max_len:]
