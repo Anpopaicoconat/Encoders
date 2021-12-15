@@ -105,7 +105,7 @@ if __name__ == '__main__':
     parser.add_argument("--use_pretrain", action="store_true")
     parser.add_argument("--architecture", required=True, type=str, help='[poly, bi, cross]')
 
-    parser.add_argument("--max_contexts_length", default=196, type=int)#
+    parser.add_argument("--max_contexts_length", default=180, type=int)#196
     parser.add_argument("--max_response_length", default=32, type=int)
     parser.add_argument("--train_batch_size", default=32, type=int, help="Total batch size for training.")
     parser.add_argument("--eval_batch_size", default=32, type=int, help="Total batch size for eval.")
