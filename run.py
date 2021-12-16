@@ -49,28 +49,11 @@ def eval_running_model(dataloader, test=False):
             with torch.no_grad():
                 logits = model(context_token_ids_list_batch, context_input_masks_list_batch,
                                               response_token_ids_list_batch, response_input_masks_list_batch)
-                print('logits', logits.size())
-                print(logits)
-                print('='*8)
-                print('labels', torch.argmax(labels_batch, 1).size())
-                print(torch.argmax(labels_batch, 1))
-                print('='*8)
                 loss = F.cross_entropy(logits, torch.argmax(labels_batch, 1))
         r2_indices = torch.topk(logits, 2)[1] # R 2 @ 100
-        print('r2_indices', r2_indices.size())
-        print(r2_indices)
-        print('='*8)
         r5_indices = torch.topk(logits, 5)[1] # R 5 @ 100
         r10_indices = torch.topk(logits, 10)[1] # R 10 @ 100
         r1 += (logits.argmax(-1) == 0).sum().item()
-        print((r2_indices==0))
-        print('='*8)
-        print((r2_indices==0).sum(-1))
-        print('='*8)
-        print(((r2_indices==0).sum(-1)).sum())
-        print('='*8)
-        print(((r2_indices==0).sum(-1)).sum().item())
-        print('='*8)
         r2 += ((r2_indices==0).sum(-1)).sum().item()
         r5 += ((r5_indices==0).sum(-1)).sum().item()
         r10 += ((r10_indices==0).sum(-1)).sum().item()
@@ -257,7 +240,7 @@ if __name__ == '__main__':
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
     print_freq = args.print_freq//args.gradient_accumulation_steps
-    eval_freq = min(len(train_dataloader) // 2, 1)#1000
+    eval_freq = min(len(train_dataloader) // 2, 1000)#1000
     eval_freq = eval_freq//args.gradient_accumulation_steps
     print('Print freq:', print_freq, "Eval freq:", eval_freq)
 
