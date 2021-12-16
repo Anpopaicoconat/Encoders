@@ -59,7 +59,7 @@ class BiEncoder(BertPreTrainedModel):
             context_vec = context_vec.unsqueeze(1)
             print('context_vec', context_vec.size(), 'responses_vec', responses_vec.permute(0, 2, 1).size())
             dot_product = torch.matmul(context_vec, responses_vec.permute(0, 2, 1)).squeeze()
-            print(dot_product)
+            print(dot_product.size())
             return dot_product
 
 
