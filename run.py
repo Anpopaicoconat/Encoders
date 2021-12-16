@@ -59,7 +59,7 @@ def eval_running_model(dataloader, test=False):
         r2_indices = torch.topk(logits, 2)[1] # R 2 @ 100
         print('r2_indices', r2_indices.size())
         print(r2_indices)
-        print('='*8
+        print('='*8)
         r5_indices = torch.topk(logits, 5)[1] # R 5 @ 100
         r10_indices = torch.topk(logits, 10)[1] # R 10 @ 100
         r1 += (logits.argmax(-1) == 0).sum().item()
