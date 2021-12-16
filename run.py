@@ -63,6 +63,14 @@ def eval_running_model(dataloader, test=False):
         r5_indices = torch.topk(logits, 5)[1] # R 5 @ 100
         r10_indices = torch.topk(logits, 10)[1] # R 10 @ 100
         r1 += (logits.argmax(-1) == 0).sum().item()
+        print((r2_indices==0))
+        print('='*8)
+        print((r2_indices==0).sum(-1))
+        print('='*8)
+        print(((r2_indices==0).sum(-1)).sum())
+        print('='*8)
+        print(((r2_indices==0).sum(-1)).sum().item())
+        print('='*8)
         r2 += ((r2_indices==0).sum(-1)).sum().item()
         r5 += ((r5_indices==0).sum(-1)).sum().item()
         r10 += ((r10_indices==0).sum(-1)).sum().item()
