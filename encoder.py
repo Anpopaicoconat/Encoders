@@ -38,16 +38,20 @@ class BiEncoder(BertPreTrainedModel):
 
         if labels is not None:
             pt_candidates = responses_vec.squeeze(1)
-            logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
+            #logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
 
-            labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
-            loss = nn.CrossEntropyLoss()(logits, labels)
+            #labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
+            #loss = nn.CrossEntropyLoss()(logits, labels)
 
             #responses_vec = responses_vec.squeeze(1)
             #dot_product = torch.matmul(context_vec, responses_vec.t())  # [bs, bs]
             #mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
             #loss = F.log_softmax(dot_product, dim=-1)
             #loss = (-loss.sum(dim=1)).mean()
+            logits = torch.cdist(context_vec, pt_candidates)
+            mask = torch.eye(logits.size(0))
+            loss = (logits*mask).sum(dim=-1) + (logits * torch.abs(mask-1)).sum(dim=-1)
+            loss = loss.mean()
             return loss
 
         else:
