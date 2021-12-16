@@ -240,7 +240,7 @@ if __name__ == '__main__':
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
     print_freq = args.print_freq//args.gradient_accumulation_steps
-    eval_freq = min(len(train_dataloader) // 2, 10)#1000
+    eval_freq = min(len(train_dataloader) // 2, 100)#1000
     eval_freq = eval_freq//args.gradient_accumulation_steps
     print('Print freq:', print_freq, "Eval freq:", eval_freq)
 
