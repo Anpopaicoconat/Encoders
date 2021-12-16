@@ -48,10 +48,10 @@ class BiEncoder(BertPreTrainedModel):
             #mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
             #loss = F.log_softmax(dot_product, dim=-1)
             #loss = (-loss.sum(dim=1)).mean()
-            #logits = torch.cdist(context_vec, pt_candidates)
-            logits = torch.cosine_similarity(context_vec, pt_candidates)
+            logits = torch.cdist(context_vec, pt_candidates)
+            #logits = torch.cosine_similarity(context_vec, pt_candidates)
             mask = torch.eye(logits.size(0)).to(context_input_ids.device)
-            loss = (logits*mask).sum(dim=-1) + (logits * torch.abs(mask-1)).sum(dim=-1)
+            loss = -(logits * torch.abs(mask-1)).sum(dim=-1) + (logits*mask).sum(dim=-1)
             loss = loss.mean()
             return loss
 
