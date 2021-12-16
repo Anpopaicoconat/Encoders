@@ -37,7 +37,7 @@ class BiEncoder(BertPreTrainedModel):
             responses_vec = cand_emb.view(batch_size, res_cnt, -1) # [bs, res_cnt, dim]
 
         if labels is not None:
-            pt_candidates = responses_vec.squeeze(1)
+            responses_vec = responses_vec.squeeze(1)
             #logits = torch.matmul(context_vec, pt_candidates.t())  # [bs, bs]
 
             #labels = torch.arange(batch_size, dtype=torch.long).to(logits.device)
@@ -48,7 +48,7 @@ class BiEncoder(BertPreTrainedModel):
             #mask = torch.eye(context_input_ids.size(0)).to(context_input_ids.device)
             #loss = F.log_softmax(dot_product, dim=-1)
             #loss = (-loss.sum(dim=1)).mean()
-            logits = torch.cdist(context_vec, pt_candidates)
+            logits = torch.cdist(context_vec, responses_vec)
             #logits = torch.cosine_similarity(context_vec, pt_candidates)
             mask = torch.eye(logits.size(0)).to(context_input_ids.device)
             loss = -(logits * torch.abs(mask-1)).sum(dim=-1) + (logits*mask).sum(dim=-1)
@@ -57,7 +57,7 @@ class BiEncoder(BertPreTrainedModel):
 
         else:
             #context_vec = context_vec.unsqueeze(1)
-            pt_candidates = responses_vec.squeeze(1)
+            responses_vec = responses_vec.squeeze(1)
             #dot_product = torch.matmul(context_vec, responses_vec.permute(0, 2, 1)).squeeze()
             dot_product = torch.cdist(context_vec, responses_vec.permute(0, 2, 1)).squeeze()
             return dot_product
